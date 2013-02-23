@@ -1,8 +1,11 @@
 package files;
 
 import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.regex.Pattern;
 
 import coalescent.ArgHandler;
 
@@ -14,10 +17,9 @@ public class fileReader {
 	}
 	public void paramFileProcess(){
 		try {
-			BufferedReader stream = new BufferedReader(
-					new FileReader(fileSet.getParamFile()));
+			BufferedReader stream = getFileToRead(fileSet.getParamFile().toString());
 			String line;
-			while((line = stream.readLine())!=null){
+			while((line = stream.readLine())!=null){//reading everything line by line
 				char[] charLine = line.toCharArray();
 					for(int i =0;i<charLine.length;i++){
 						if(charLine[i]=='#' && i == 0){//comment
@@ -44,13 +46,14 @@ public class fileReader {
 			System.out.println("Error paramFileProcess" + e.getMessage() );
 		}
 	}
-	private void processParamBuffer(String line) {
-		//process the log file
+	private void processParamBuffer(String line) {//gonna have to make some objects
+		//process the param file
 		if(line.contains("length")){
 			System.out.println(line);
 		}
 		else if (line.contains("recomb_file")){
 			System.out.println(line);
+			processRecombFile(line);
 		}
 		else if (line.contains("mutation_rate")){
 			System.out.println(line);
@@ -87,5 +90,39 @@ public class fileReader {
 					"this parameter will be skipped";
 			System.out.println(err);
 		}
+	}
+	private void processRecombFile(String line) {
+		try{
+		BufferedReader aStream;
+		String fileType = "recomb_file";
+		//line.replace(" ", "");//maybe bad for windows machines with spaces in filename
+		line = line.trim();
+		line = line.substring(fileType.length());
+		aStream = getFileToRead(line.trim());
+		while((line = aStream.readLine() )!=null){
+			String[] result = line.split("\\s+");
+			int start = Integer.parseInt(result[0]);
+			double rate = Double.parseDouble(result[1]);
+			System.out.println(start + " " + rate);
+		}
+		
+		
+			aStream.close();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		
+	}
+	private BufferedReader getFileToRead(String aPath){
+	 BufferedReader bf;
+	try {
+		bf = new BufferedReader(new FileReader(aPath));
+		return bf;
+	} catch (FileNotFoundException e) {
+		// TODO Auto-generated catch block
+		e.printStackTrace();
+		return null;
+	}
+	 
 	}
 }
