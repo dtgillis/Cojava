@@ -3,9 +3,10 @@ package coalescent;
 import java.io.File;
 
 public class ArgHandler {
-		boolean logFileSet,segFileSet,outFileSet,paramFileSet;
+		boolean logFileSet,segFileSet,outFileSet,paramFileSet,Debug;
 		File logFile,segFile,outFile,paramFile;
 		String[] arguments;
+		
 		public ArgHandler(String[] args){
 			arguments = args;
 		}
