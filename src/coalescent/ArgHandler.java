@@ -45,19 +45,36 @@ public class ArgHandler {
 			
 		}
 		private void setOutFile(String aFile) {//needs to be writable
+			//actually the base file name so need to be worked out 
 			outFile = new File(aFile);
 			outFileSet = true;
+		}
+		public File getOutFile(){
+			assert outFileSet;
+			return outFile;
 		}
 		private void setSegFile(String aFile) {
 			segFile = new File(aFile);
 			segFileSet = true;
 		}
+		public File getSegFile(){
+			assert segFileSet;
+			return segFile;
+		}
 		private void setParamFile(String aFile) {
 			paramFile = new File(aFile);
 			paramFileSet = true;
 		}
+		public File getParamFile(){
+			assert paramFileSet;
+			return paramFile;
+		}
 		private void setLogFile(String aFile) {//needs to be writable
 			logFile = new File(aFile);
 			logFileSet = true;
+		}
+		public File getLogFile(){
+			assert logFileSet;
+			return logFile;
 		}
 }
