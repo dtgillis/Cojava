@@ -13,20 +13,33 @@ public class fileReader {
 		fileSet = aFileSet;
 		
 	}
-	public void parmFileProcess(){
+	public void paramFileProcess(){
 		try {
 			BufferedReader stream = new BufferedReader(
 					new FileReader(fileSet.getParamFile()));
 			String line;
 			while((line = stream.readLine())!=null){
-				processBuffer(line);
+				char[] charLine = line.toCharArray();
+					for(int i =0;i<charLine.length;i++){
+						if(charLine[i]=='#' && i == 0){//comment
+							i = charLine.length;
+						}
+						else if(charLine[i]=='#' && i!=0){//comment at a point in line kill comment 
+							line = line.substring(0, i);
+							processParamBuffer(line);
+						}
+						else
+							processParamBuffer(line);
+					}
 			}
+		stream.close();
+		
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			System.out.println("Error paramFileProcess" + e.getMessage() );
 		}
 	}
-	private void processBuffer(String line) {
+	private void processParamBuffer(String line) {
 		//process the log file
 		if(line.contains("length")){
 			
