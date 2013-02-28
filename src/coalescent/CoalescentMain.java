@@ -10,6 +10,7 @@ public class CoalescentMain {
 		fileHolder.setArguments();
 		inputHandler = new fileReader(fileHolder);
 		inputHandler.paramFileProcess();
+		
 	}
 
 }

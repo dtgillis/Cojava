@@ -7,10 +7,14 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.regex.Pattern;
 
-import coalescent.ArgHandler;
+import recomb.recListMaker;
 
+import coalescent.ArgHandler;
 public class fileReader {
 	ArgHandler fileSet;
+	recListMaker recomb;
+
+	private boolean debug = true;
 	public fileReader(ArgHandler aFileSet ){
 		fileSet = aFileSet;
 		
@@ -99,15 +103,14 @@ public class fileReader {
 		line = line.trim();
 		line = line.substring(fileType.length());
 		aStream = getFileToRead(line.trim());
-		while((line = aStream.readLine() )!=null){
-			String[] result = line.split("\\s+");
-			int start = Integer.parseInt(result[0]);
-			double rate = Double.parseDouble(result[1]);
-			System.out.println(start + " " + rate);
-		}
-		
-		
-			aStream.close();
+		recomb = new recListMaker();
+			while((line = aStream.readLine() )!=null){
+				String[] result = line.split("\\s+");
+				int start = Integer.parseInt(result[0]);
+				double rate = Double.parseDouble(result[1]);
+				recomb.addRecombSiteLL(start, rate);
+			}
+		aStream.close();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
