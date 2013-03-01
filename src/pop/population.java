@@ -1,5 +1,7 @@
 package pop;
 
+import nodes.nodeList;
+
 public class population {
 	String name;
 	int popSize;
