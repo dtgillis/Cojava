@@ -8,11 +8,12 @@ import java.io.IOException;
 import java.util.regex.Pattern;
 
 import recomb.recListMaker;
+import simulator.sim;
 
 import coalescent.ArgHandler;
 public class fileReader {
 	ArgHandler fileSet;
-	recListMaker recomb;
+	recListMaker recomb = new recListMaker();
 
 	private boolean debug = true;
 	public fileReader(ArgHandler aFileSet ){
@@ -52,8 +53,10 @@ public class fileReader {
 	}
 	private void processParamBuffer(String line) {//gonna have to make some objects
 		//process the param file
-		if(line.contains("length")){
+		if(line.contains("length")){//length has to be set before recomb file
 			System.out.println(line);
+			recomb.setLength(Integer.parseInt(cleanString(line)[1]));
+			//also need gc_set_length
 		}
 		else if (line.contains("recomb_file")){
 			System.out.println(line);
@@ -61,6 +64,7 @@ public class fileReader {
 		}
 		else if (line.contains("mutation_rate")){
 			System.out.println(line);
+			
 		}
 		else if (line.contains("infinite_sites")){
 			System.out.println(line);
@@ -103,7 +107,6 @@ public class fileReader {
 		line = line.trim();
 		line = line.substring(fileType.length());
 		aStream = getFileToRead(line.trim());
-		recomb = new recListMaker();
 			while((line = aStream.readLine() )!=null){
 				String[] result = line.split("\\s+");
 				int start = Integer.parseInt(result[0]);
@@ -111,6 +114,7 @@ public class fileReader {
 				recomb.addRecombSiteLL(start, rate);
 			}
 		aStream.close();
+		recomb.recomb_calc_r();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -121,11 +125,15 @@ public class fileReader {
 	try {
 		bf = new BufferedReader(new FileReader(aPath));
 		return bf;
-	} catch (FileNotFoundException e) {
+	} 	catch (FileNotFoundException e) {
 		// TODO Auto-generated catch block
 		e.printStackTrace();
 		return null;
+		}
 	}
-	 
+	private String[] cleanString(String aLine){
+		String[] result = aLine.split("\\s+");
+		return result;
 	}
 }
+

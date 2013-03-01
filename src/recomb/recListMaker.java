@@ -22,10 +22,7 @@ public class recListMaker {
 	ArrayList<recombStructure> recList;
 	
 	public recListMaker(){
-	    recList = new ArrayList<recombStructure>();
-	    //recombStructure min = new recombStructure(Integer.MIN_VALUE,0,0,null);
-	    recList.add(0,new recombStructure(Integer.MIN_VALUE,0,0,null));
-		count = 0;
+	    
 	}
 	public void setLength(int i){
 		length = i;
@@ -65,6 +62,19 @@ public class recListMaker {
 		return recombs;
 	}
 	
-	
+	public void recomb_calc_r(){
+		double rr = 0;
+		recombStructure tempRecomb = recombs;
+		while(tempRecomb!=null && tempRecomb.startBase < length){
+			if(tempRecomb.next == null || tempRecomb.next.startBase > length)
+				rr += (length - tempRecomb.startBase)*tempRecomb.rate;
+			else
+				rr += (tempRecomb.next.startBase - tempRecomb.startBase) * tempRecomb.rate;
+			
+			tempRecomb.cumulative = rr;
+			tempRecomb = tempRecomb.next;
+		}
+		recombRate = rr;
+	}
 	
 }
