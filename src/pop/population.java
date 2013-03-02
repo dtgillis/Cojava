@@ -4,11 +4,11 @@ import nodes.node;
 import nodes.nodeList;
 
 public class population {
-	String name;
+	int name;
 	int popSize;
 	char[] label;
 	nodeList members;
-	public population(String aName,int aPopSize, char[] aLabel){
+	public population(int aName,int aPopSize, char[] aLabel){
 		name = aName;
 		popSize = aPopSize;
 		label = aLabel;
@@ -37,10 +37,14 @@ public class population {
 	public node getNode(int index){
 		return members.getNode(index);
 	}
-	public String getPopName(){
+	public int getPopName(){
 		return name;
+	}
+	public void setPopName(int aName){
+		name = aName;
 	}
 	public char[] getPopLabel(){
 		return label;
 	}
+	
 }

@@ -21,6 +21,24 @@ public class node {
 		name = aName;
 		
 		}
+		public seg getSegment(){
+			return segment;
+		}
+		public void setSegment(){
+			
+		}
+		public node[] getDescendents(){
+			return descendent;
+		}
+		public double getGen(){
+			return gen;
+		}
+		public int getName(){
+			return name;
+		}
+		public int getPop(){
+			return pop;
+		}
 		public void printNode(node aNode){
 			System.out.println("node: "+ aNode.name + " pop:  " + aNode.pop + " gen: " + aNode.gen + " ");
 			//segs out as well
