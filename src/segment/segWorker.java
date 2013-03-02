@@ -180,5 +180,12 @@ public class segWorker {
 		}
 		return false;
 	}
+	public void printSeg(seg aSeg){
+		if(aSeg != null){
+			System.out.println(aSeg.begin + "  " + aSeg.end);
+			printSeg(aSeg.next);
+			
+		}
+	}
 }
 
