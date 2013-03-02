@@ -36,4 +36,13 @@ public class nodeList {
 			System.out.println(nodes.get(i).name);
 		}
 	}
+	public int getNumMembers(){
+		return numMembers;
+	}
+	public int getSizeNow(){
+		return sizeNow;
+	}
+	public node getNode(int index){
+		return nodes.get(index);
+	}
 }
