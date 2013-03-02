@@ -24,17 +24,23 @@ public class node {
 		public seg getSegment(){
 			return segment;
 		}
-		public void setSegment(){
-			
+		public void setSegment(seg aSeg){
+			segment = aSeg;
 		}
 		public node[] getDescendents(){
 			return descendent;
+		}
+		public void setGen(double aGen){
+			gen = aGen;
 		}
 		public double getGen(){
 			return gen;
 		}
 		public int getName(){
 			return name;
+		}
+		public void setName(int aName){
+			name = aName;
 		}
 		public int getPop(){
 			return pop;

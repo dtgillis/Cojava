@@ -85,11 +85,11 @@ public class nodeWorker {
 	
 	public int nodeBreakOffSeg(node aNode, node newNode1, node newNode2,
 			double begin, double end){
-		double gen = aNode.gen;
+		double gen = aNode.getGen();
 		seg aSeg, seg1,seg2;
 		aSeg = new seg(begin,end);
-		seg1 = segFactory.segIntersect(aNode.segment, aSeg);
-		seg2 = segFactory.segIntersect(aNode.segment, segFactory.segInverse(aSeg));
+		seg1 = segFactory.segIntersect(aNode.getSegment(), aSeg);
+		seg2 = segFactory.segIntersect(aNode.getSegment(), segFactory.segInverse(aSeg));
 		aSeg = null;
 		
 		if(seg1 == null || seg2 == null){
@@ -100,10 +100,10 @@ public class nodeWorker {
 			return 1;
 		}
 		
-		newNode1 = makeEmptyNode(gen,aNode.pop,aNode);
-		newNode1.segment = seg1;
-		newNode2 = makeEmptyNode(gen,aNode.pop,aNode);
-		newNode2.segment = seg2;
+		newNode1 = makeEmptyNode(gen,aNode.getPop(),aNode);
+		newNode1.setSegment(seg1);
+		newNode2 = makeEmptyNode(gen,aNode.getPop(),aNode);
+		newNode2.setSegment(seg2);
 		return 2;
 		
 	}
