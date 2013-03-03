@@ -34,6 +34,9 @@ public class population {
 	public int getNumNodes(){
 		return members.getNumMembers();
 	}
+	public nodeList getMembers(){
+		return members;
+	}
 	public node getNode(int index){
 		return members.getNode(index);
 	}

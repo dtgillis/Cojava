@@ -45,12 +45,12 @@ public class node {
 		public int getPop(){
 			return pop;
 		}
-		public void printNode(node aNode){
-			System.out.println("node: "+ aNode.name + " pop:  " + aNode.pop + " gen: " + aNode.gen + " ");
+		public void printNode(){
+			System.out.println("node: "+ name + " pop:  " + pop + " gen: " + gen + " ");
 			//segs out as well
 			System.out.println("desc: ");
 			for(int i=0;i<2;i++){
-				System.out.println(aNode.descendent[i].name);
+				System.out.println(descendent[i].name);
 			}
 		}
 	}
