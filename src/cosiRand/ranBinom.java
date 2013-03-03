@@ -111,7 +111,7 @@ public class ranBinom {
 		
 		return xa/(xa+xb);
 	}
-	private double rangam(double a) {
+	public double rangam(double a) {
 		/**
 		   generate gamma deviate mean a
 		  */
@@ -122,5 +122,8 @@ public class ranBinom {
 		    return ranexp();
 		  }
 		  return randev1(a);
+	}
+	public double getRandomDouble(){
+		return generator.nextDouble();
 	}
 }
