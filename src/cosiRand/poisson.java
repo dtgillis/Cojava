@@ -40,7 +40,7 @@ public class poisson {
 		
 	}
 	public static double poissonGetNext(double rate){
-		double ed;
+		//double ed;
 		if(rate ==0) return -1;
 		//ed = expDev();
 		return (expDev()/rate);
