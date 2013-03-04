@@ -48,6 +48,12 @@ public class demography {
 		numSites = 1; 
 		
 	}
+	public void setLogFile(File aFile){
+		logFile = aFile;
+	}
+	public File getLogFile(){
+		return logFile;
+	}
 	public siteList addRecombSite(double site, siteList aSiteList ) {
 		siteList newSiteList, thisList, lastList;
 		thisList = new siteList();
@@ -730,7 +736,7 @@ public class demography {
 		tempPopList.setNext(aPopList);
 		aPopList = tempPopList;//not sure this may need to return aPopList....
 		numPops ++;
-		dgLog(CREATE_POP , gen , null);
+		dgLog(CREATE_POP , gen , newPop );
 	}
 	
 	
