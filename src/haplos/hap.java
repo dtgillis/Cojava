@@ -1,18 +1,70 @@
 package haplos;
 
-import pop.population;
+import java.util.ArrayList;
 
 public class hap {
-	int npop,popid,nchrom,whichPopIndex,mutIndex,nMut,mutArraySize;
-	final int INIT_SIZE = 100;
-	population aPop;
+	int nPop,nChrom;
+	int[] popId,whichPopInd,mutArraySize,nMut;
+	ArrayList<int[]> mutIndex;
 	public hap(){
 		
-		
 	}
-	public void hapAssignChroms(){
-		int running = 0;
-		//npop = 
-		
+	public void setnChrom(int data){
+		this.nChrom = data;
 	}
+	public int getNChrom(){
+		return nChrom;
+	}
+	public int getnPop() {
+		return nPop;
+	}
+	public void setnPop(int nPop) {
+		this.nPop = nPop;
+	}
+	public int[] getnMut() {
+		return nMut;
+	}
+	public void setnMut(int[] nMut) {
+		this.nMut = nMut;
+	}
+	public void setnMut(int index,int data){
+		this.nMut[index]=data;
+	}
+	public int[] getMutArraySize() {
+		return mutArraySize;
+	}
+	public void setMutArraySize(int index,int data){
+		this.mutArraySize[index] = data;
+	}
+	public void setMutArraySize(int[] mutArraySize) {
+		this.mutArraySize = mutArraySize;
+	}
+	public int[] getWhichPopInd() {
+		return whichPopInd;
+	}
+	public void setWhichPopInd(int index,int data){
+		this.whichPopInd[index] = data;
+	}
+	public void setWhichPopInd(int[] whichPopInd) {
+		this.whichPopInd = whichPopInd;
+	}
+	public void setPopId(int index,int data){
+		this.popId[index] = data;
+	}
+	public int[] getPopId() {
+		return popId;
+	}
+	public void setPopId(int[] pipId) {
+		this.popId = pipId;
+	}
+	public void setMutIndex(int index,int[] data){
+		this.mutIndex.add(data);
+	}
+	public ArrayList<int[]> getMutIndex() {
+		return mutIndex;
+	}
+	public void setMutIndex(ArrayList<int[]> aMutIndex) {
+		this.mutIndex = aMutIndex;
+	}
+	
 }
