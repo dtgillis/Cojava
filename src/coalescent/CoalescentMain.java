@@ -1,5 +1,7 @@
 package coalescent;
 
+import java.io.IOException;
+
 import nodes.nodeWorker;
 import coalesce.coalesce;
 import recomb.recListMaker;
@@ -54,6 +56,12 @@ public class CoalescentMain {
 		dem.initRecomb();
 		sweeper.sweepInitMut(aMutList, haps);
 		simulator.simExecute();
+		try {
+			simulator.simMutate(fileHolder.getOutFile(), aMutList, haps);
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		
 		
 		
