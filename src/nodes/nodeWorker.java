@@ -66,8 +66,8 @@ public class nodeWorker {
 			double loc, double locend){
 		seg aSeg,seg1,seg2;
 		aSeg = new seg(loc,locend);
-		seg1 = segFactory.segIntersect(aNode.segment, aSeg);
-		seg2 = segFactory.segIntersect(aNode.segment, segFactory.segInverse(aSeg));
+		seg1 = segFactory.segIntersect(aNode.getSegment(), aSeg);
+		seg2 = segFactory.segIntersect(aNode.getSegment(), segFactory.segInverse(aSeg));
 		aSeg = null;
 		if(seg1 ==null || seg2 == null){
 			if(seg1!=null)
@@ -77,9 +77,9 @@ public class nodeWorker {
 			
 			return 1;
 		}
-		newNode1 = makeEmptyNode(gen,aNode.pop,aNode);
-		newNode1.segment = seg1;
-		newNode2 = makeEmptyNode(gen,aNode.pop,aNode);
+		newNode1 = makeEmptyNode(gen,aNode.getPop(),aNode);
+		newNode1.setSegment(seg1);
+		newNode2 = makeEmptyNode(gen,aNode.getPop(),aNode);
 		return 2;
 	}
 	
