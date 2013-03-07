@@ -2,6 +2,8 @@ package demography;
 
 import java.io.File;
 
+import coalescent.CoalescentMain;
+
 import cosiRand.ranBinom;
 
 import nodes.node;
@@ -17,7 +19,6 @@ public class demography {
 	population completePop;
 	int numPops,totMembers,numSites;
 	segWorker segFactory;
-	nodeWorker nodeFactory;
 	//constants for switch for logging
 	final int ADD_NODE = 1;
 	final int COALESCE = 2;
@@ -38,7 +39,7 @@ public class demography {
 		totMembers = 0;
 		completePop = new population(-1,0,"complete_nodes".toCharArray());
 		segFactory = new segWorker();
-		nodeFactory = new nodeWorker();
+//		nodeFactory = new nodeWorker();
 		randBinom = new ranBinom();
 
 	}
@@ -53,6 +54,9 @@ public class demography {
 	}
 	public File getLogFile(){
 		return logFile;
+	}
+	public siteList getRecombSites(){
+		return recombSites;
 	}
 	public siteList addRecombSite(double site, siteList aSiteList ) {
 		siteList newSiteList, thisList, lastList;
@@ -122,7 +126,7 @@ public class demography {
 		node doneNode = null;
 		node contNode = null;
 		int numberOfNodes;
-		numberOfNodes = nodeFactory.nodeBreakOffSeg(aNode, doneNode, contNode , begin, end);
+		numberOfNodes = CoalescentMain.nodeFactory.nodeBreakOffSeg(aNode, doneNode, contNode , begin, end);
 		if(numberOfNodes == 2){
 			completePop.addNode(doneNode);//not sure this will work...
 			aPop.removeNode(aNode);
@@ -162,14 +166,14 @@ public class demography {
 			System.out.println("duplicate population name used");
 		}
 		newPop = new population(popName, 0, label);
-		addPop(newPop,gen,pops);
+		this.addPop(newPop,gen,pops);
 		
 	}
 	public void populateByName(int popName,int members, double gen){
 		population aPop = getPopByNameInt(popName,pops);
 		node tempNode;
 		for(int i=0;i<members;i++){
-			tempNode = nodeFactory.makeNewNode(0, 1, gen, popName);
+			tempNode = CoalescentMain.nodeFactory.makeNewNode(0, 1, gen, popName);
 			aPop.addNode(tempNode);
 			dgLog(ADD_NODE,gen,tempNode,aPop);
 			
@@ -236,14 +240,14 @@ public class demography {
 		 */ 
 		aPop = getPopByNameInt(popName,pops);
 		//step 1
-		node1Index = (int)(randBinom.getRandomDouble()*aPop.getMembers().getNumMembers());
-		node2Index = (int)(randBinom.getRandomDouble()*aPop.getMembers().getNumMembers() - 1);
+		node1Index = (int)(cosiRand.randomNum.randomDouble()*aPop.getMembers().getNumMembers());
+		node2Index = (int)(cosiRand.randomNum.randomDouble()*aPop.getMembers().getNumMembers() - 1);
 		
 		if(node2Index >= node1Index) node2Index++;
 		aNode1 = aPop.getNode(node1Index);
 		aNode2 = aPop.getNode(node2Index);
 		//step 2
-		newNode = nodeFactory.nodeCoalesce(aNode1, aNode2, gen);
+		newNode = CoalescentMain.nodeFactory.nodeCoalesce(aNode1, aNode2, gen);
 		
 		//step 2a
 		while(siteTemp.getNext()!=null){
@@ -347,10 +351,10 @@ public class demography {
 		 */
 		aPop = getPopByIndex(popIndex);
 		//step 1
-		nodeIndex = (int) (randBinom.getRandomDouble()*aPop.getMembers().getNumMembers());
+		nodeIndex = (int) (cosiRand.randomNum.randomDouble()*aPop.getMembers().getNumMembers());
 		aNode = aPop.getNode(nodeIndex);
 		//step 2
-		nr = nodeFactory.nodeRecombine(aNode, newNode1, newNode2, gen, loc);
+		nr = CoalescentMain.nodeFactory.nodeRecombine(aNode, newNode1, newNode2, gen, loc);
 		//step 3
 		if(nr ==2){
 			//step 4
@@ -374,8 +378,8 @@ public class demography {
 	// gene conversion
 	public  node[] gcByIndex(int popIndex,double gen, double loc, double locend){
 		node newNode1,newNode2,aNode;
-		newNode1 = null;
-		newNode2 = null;
+		newNode1 = new node(0,0,0,0,0);
+		newNode2 = new node(0,0,0,0,0);
 		node[] returnNodes = null;
 		population aPop;
 		int nodeIndex,nr;
@@ -393,10 +397,10 @@ public class demography {
 		 */
 		aPop = getPopByIndex(popIndex);
 		//step 1
-		nodeIndex = (int) randBinom.getRandomDouble() * aPop.getMembers().getNumMembers();
+		nodeIndex = (int) cosiRand.randomNum.randomDouble() * aPop.getMembers().getNumMembers();
 		aNode = aPop.getNode(nodeIndex);
 		//step 2
-		nr = nodeFactory.nodeGC(aNode, newNode1, newNode2, gen, loc, locend);
+		nr = CoalescentMain.nodeFactory.nodeGC(aNode, newNode1, newNode2, gen, loc, locend);
 		//step 3 
 		if(nr ==2){
 			//step 4
@@ -428,7 +432,7 @@ public class demography {
 		int nodeIndex;
 		popFrom = getPopByNameInt(fromPop,pops);
 		popTo = getPopByNameInt(toPop,pops);
-		nodeIndex = (int) (randBinom.getRandomDouble()*popFrom.getNumNodes());
+		nodeIndex = (int) (cosiRand.randomNum.randomDouble()*popFrom.getNumNodes());
 		tempNode = popFrom.getMembers().getNode(nodeIndex);
 		popFrom.removeNode(tempNode);
 		popTo.addNode(tempNode);
@@ -447,7 +451,7 @@ public class demography {
 		popTo = getPopByNameInt(toPop,pops);
 		numToMove = randBinom.ranbinom(popFrom.getNumNodes(), members);
 		for(int i=0;i<numToMove;i++){
-			nodeIndex = (int) (randBinom.getRandomDouble() * popFrom.getNumNodes());
+			nodeIndex = (int) (cosiRand.randomNum.randomDouble() * popFrom.getNumNodes());
 			tempNode = popFrom.getNode(nodeIndex);
 			popFrom.removeNode(tempNode);
 			popTo.addNode(tempNode);
@@ -647,7 +651,7 @@ public class demography {
 			break;
 		case HISTORICAL:
 			// HISTORICAL string_descriptions
-			string1 = (String) args[0];
+			string1 = args[0].toString();
 			out = " " + gen + "\tH\t" + string1 + "\n";
 			break;
 		case MIG_RATE:
@@ -735,6 +739,7 @@ public class demography {
 		tempPopList.setPop(newPop);
 		tempPopList.setNext(aPopList);
 		aPopList = tempPopList;//not sure this may need to return aPopList....
+		pops = aPopList;
 		numPops ++;
 		dgLog(CREATE_POP , gen , newPop );
 	}
@@ -866,6 +871,5 @@ public class demography {
 		time += calcTimeInBranch(point,aNode.getGen(),aNode.getDescendents()[1]);
 		return time;
 	}
-	
 	
 }
