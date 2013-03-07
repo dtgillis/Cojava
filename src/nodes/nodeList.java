@@ -12,7 +12,7 @@ public class nodeList {
 	public nodeList(){
 		numMembers = 0 ;
 		sizeNow = NODELIST_INITSIZE;
-		
+		nodes = new ArrayList<node>(NODELIST_INITSIZE);
 	}
 	public void addNode(node aNode){
 		if(numMembers >= sizeNow -1){
@@ -27,6 +27,7 @@ public class nodeList {
 		for(int i=0;i<nodes.size();i++){
 			if(nodes.get(i).name == aNode.name){
 				nodes.remove(i);
+				numMembers--;
 				return;
 			}
 		}
