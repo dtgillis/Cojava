@@ -22,7 +22,7 @@ public class hapWorker {
 		
 		for(int ipop = 0 ;ipop<npop;ipop++){
 			running += CoalescentMain.dem.getNumNodesInPopByIndex(ipop);
-			haplos.setMutArraySize(ipop,CoalescentMain.dem.getPopNameByIndex(ipop));
+			haplos.setPopId(ipop,CoalescentMain.dem.getPopNameByIndex(ipop));
 			
 		}
 		
