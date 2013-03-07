@@ -66,5 +66,9 @@ public class hap {
 	public void setMutIndex(ArrayList<int[]> aMutIndex) {
 		this.mutIndex = aMutIndex;
 	}
-	
+	public void setMutIndex(int index1,int index2,int data ){
+		int[] temp = mutIndex.get(index1);
+		temp[index2] = data;
+		mutIndex.add(index1,temp);
+	}
 }
