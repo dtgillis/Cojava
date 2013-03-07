@@ -33,5 +33,8 @@ public class mutList {
 	public int getNMut(){
 		return nMut;
 	}
+	public double[] getPos(){
+		return pos;
+	}
 	
 }
