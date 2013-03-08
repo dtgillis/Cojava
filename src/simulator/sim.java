@@ -154,7 +154,8 @@ public class sim {
 		public boolean simDoPoisson(double gen){
 			boolean didCoal = false;
 			double randDouble = cosiRand.randomNum.randomDouble();
-			double dum = 0,dum2 = 0;
+			Double dum = new Double(0);
+			Double dum2 = new Double(0);
 			int popIndex;
 			if(randDouble < recombRate /poissonRate){
 				popIndex = CoalescentMain.recomb.recombPickPopIndex();
