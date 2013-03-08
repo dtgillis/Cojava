@@ -14,7 +14,7 @@ public class gc {
 		gcRate = 0;
 		lastGCRate = 0;
 		gcLength = 500; //in bp
-		random = new ranBinom();
+		//random = new ranBinom();
 	}
 	public void setGCRate(double gcr){
 		geneConversionRate = gcr;
@@ -47,7 +47,7 @@ public class gc {
 	public int pickPopIndex(){
 		//figure out which pop to recombine
 		int popIndex = 0;
-		double randCounter = random.getRandomDouble() * lastGCRate;//maybe need to call Random class instead less memory?
+		double randCounter = cosiRand.randomNum.randomDouble() * lastGCRate;//maybe need to call Random class instead less memory?
 		int numPops = CoalescentMain.dem.getNumPops();
 		int numNodes;
 		double rate = 0;
@@ -63,11 +63,11 @@ public class gc {
 		}
 		return popIndex;
 	}
-	public node[] execute(double gen , int popIndex,double location1,double location2){
+	public node[] execute(double gen , int popIndex,Double location1,Double location2){
 		double loc,loc2;
 		double temp,temp1;
 		//choosing location..
-		temp1 = random.getRandomDouble();
+		temp1 = cosiRand.randomNum.randomDouble();
 		temp = (double) (temp1*gcRate);
 		loc = (double) ((int)(temp/gcRate*(length + gcLength) - gcLength)) / length ;
 		loc2 = (double) ((int)(temp/gcRate * (length + gcLength)))/length;
