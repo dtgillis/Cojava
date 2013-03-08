@@ -180,8 +180,13 @@ public class mutations {
 			out = out + String.format("%d ", tempMNList.getNodeName());
 			ichr = tempMNList.getNodeName();
 			if(aHap.getnMut()[ichr] == aHap.getMutArraySize()[ichr]){
-				aHap.setMutArraySize(ichr, 2);
-				aHap.setMutIndex(ichr, new int[aHap.getMutArraySize()[ichr]]);
+				aHap.setMutArraySize(ichr, aHap.getMutArraySize()[ichr]*2);
+				int[] temp = new int[aHap.getMutArraySize()[ichr]];
+				//aHap.setMutIndex(ichr, new int[aHap.getMutArraySize()[ichr]]);
+				for(i=0;i<aHap.getMutIndex().get(ichr).length;i++){
+					temp[i] = aHap.getMutIndex().get(ichr)[i];
+				}
+				aHap.setMutIndex(ichr, temp );
 			}
 			aHap.setMutIndex(ichr,aHap.getnMut()[ichr],aMutList.getNumMut());
 			aHap.setnMut(ichr, aHap.getnMut()[ichr]+1);
@@ -189,8 +194,12 @@ public class mutations {
 			
 		}
 		if(aMutList.getNumMut() == aMutList.getArraySize()){
-			aMutList.setArraySize(2);
-			aMutList.setPos(new double[aMutList.getArraySize()]);
+			aMutList.setArraySize(aMutList.getArraySize()*2);
+			double[] temp = new double[aMutList.arraySize];
+			for(i=0;i<aMutList.getPos().length;i++){
+				temp[i] = aMutList.getPos()[i];
+			}
+			aMutList.setPos(temp);
 		}
 		aMutList.setPos(aMutList.getNumMut(), aMut.getLocation());
 		aMutList.setNumMut(aMutList.getNumMut() + 1);
