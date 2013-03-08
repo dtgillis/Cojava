@@ -37,12 +37,11 @@ public class nodeWorker {
 		newNode.segment = segFactory.segUnion(aNode1.segment, aNode2.segment);
 		return newNode;
 	}
-	//this should probably return the nodes instead? nope it is the 
-	//1 or 2 that is written to the out file? so how to make these persist
-	// for the next part?
-	public int nodeRecombine(node aNode, node newNode1, node newNode2,
+	//this should probably return the nodes instead?
+	public Object[] nodeRecombine(node aNode, node newNode1, node newNode2,
 			double gen, double loc){
 		seg aSeg,seg1,seg2;
+		Object[] returnArray; //container for nodes to return....
 		aSeg = new seg(0,loc);
 		seg1 = segFactory.segIntersect(aNode.segment, aSeg);
 		seg2 = segFactory.segIntersect(aNode.segment,segFactory.segInverse(aSeg));
@@ -52,13 +51,20 @@ public class nodeWorker {
 				seg1 = null;
 			if(seg2 != null)
 				seg2 = null;
-			return 1;
+			returnArray = new Object[1];
+			returnArray[0] = 1;
+			return returnArray;
 		}
+		returnArray = new Object[3];
 		newNode1 = makeEmptyNode(gen,aNode.pop, aNode);
 		newNode1.segment = seg1;
 		newNode2 = makeEmptyNode(gen,aNode.pop,aNode);
 		newNode2.segment = seg2;
-		return 2;
+		returnArray[0] = 2;
+		returnArray[1] = newNode1;
+		returnArray[2] = newNode2;
+		
+		return returnArray;
 	}
 	// this should probably also return the nodes instead? //also basically same function as above.
 	// gene conversion //
@@ -83,8 +89,9 @@ public class nodeWorker {
 		return 2;
 	}
 	
-	public int nodeBreakOffSeg(node aNode, node newNode1, node newNode2,
+	public Object[] nodeBreakOffSeg(node aNode, node newNode1, node newNode2,
 			double begin, double end){
+		Object[] returnArray;
 		double gen = aNode.getGen();
 		seg aSeg, seg1,seg2;
 		aSeg = new seg(begin,end);
@@ -97,14 +104,19 @@ public class nodeWorker {
 				seg1 = null;
 			if(seg2 != null)
 				seg2 = null;
-			return 1;
+			returnArray = new Object[1];
+			returnArray[0] = 1;
+			return returnArray;
 		}
-		
+		returnArray = new Object[3];
+		returnArray[0]=2;
 		newNode1 = makeEmptyNode(gen,aNode.getPop(),aNode);
 		newNode1.setSegment(seg1);
 		newNode2 = makeEmptyNode(gen,aNode.getPop(),aNode);
 		newNode2.setSegment(seg2);
-		return 2;
+		returnArray[1] = newNode1;
+		returnArray[2] = newNode2;
+		return returnArray;
 		
 	}
 	public void nodeDelete(node aNode){
