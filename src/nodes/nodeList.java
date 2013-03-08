@@ -16,7 +16,7 @@ public class nodeList {
 	}
 	public void addNode(node aNode){
 		if(numMembers >= sizeNow -1){
-			sizeNow = 2;
+			sizeNow *= 2;
 			//array list handles size dynamically 
 		}
 		nodes.add(numMembers, aNode);
