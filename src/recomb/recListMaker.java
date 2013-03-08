@@ -104,9 +104,8 @@ public class recListMaker {
 				tempRecomb = tempRecomb.next;
 			}
 		}
-		if(tempRecomb == null){end = length;}
 		
-		else if(tempRecomb.next == null || tempRecomb.next.startBase > length)
+		if(tempRecomb.next == null || tempRecomb.next.startBase > length)
 			end = length;
 		else end = tempRecomb.next.startBase;
 		
