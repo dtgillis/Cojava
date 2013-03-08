@@ -1,6 +1,8 @@
 package demography;
 
 import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 
 import coalescent.CoalescentMain;
 
@@ -34,7 +36,7 @@ public class demography {
 	ranBinom randBinom;
 	
 	public demography(){
-		pops = null;
+		pops = new popList();
 		numPops = 0;
 		totMembers = 0;
 		completePop = new population(-1,0,"complete_nodes".toCharArray());
@@ -123,11 +125,14 @@ public class demography {
 		return tempPopList;
 	}
 	public int addToCompletePopulation(node aNode,population aPop,double begin,double end){
-		node doneNode = null;
-		node contNode = null;
+		node doneNode = null;//new node(0,0,0,0,0);
+		node contNode = null;// node(0,0,0,0,0);//have to not be null to track
 		int numberOfNodes;
-		numberOfNodes = CoalescentMain.nodeFactory.nodeBreakOffSeg(aNode, doneNode, contNode , begin, end);
+		Object[] results = CoalescentMain.nodeFactory.nodeBreakOffSeg(aNode, doneNode, contNode , begin, end);
+		numberOfNodes = (int) results[0];
 		if(numberOfNodes == 2){
+			doneNode = (node) results[1];
+			contNode = (node) results[2];
 			completePop.addNode(doneNode);//not sure this will work...
 			aPop.removeNode(aNode);
 			aPop.addNode(contNode);
@@ -137,7 +142,7 @@ public class demography {
 		else if(numberOfNodes == 1){
 			completePop.addNode(aNode);
 			aPop.removeNode(aNode);
-			dgLog(DONE,aNode.getGen(),(Object)aNode,(Object)doneNode,(Object)contNode);
+			dgLog(DONE,aNode.getGen(),aNode,doneNode,contNode);
 		}
 		return 0;
 				
@@ -161,10 +166,10 @@ public class demography {
 			System.out.println("createPop: popName must not be Negative");
 			
 		}
-		tempPop = getPopByNameInt(popName,pops);
-		if(tempPop!=null){
-			System.out.println("duplicate population name used");
-		}
+		//tempPop = getPopByNameInt(popName,pops);
+		//if(tempPop!=null){
+		//	System.out.println("duplicate population name used");
+		//}
 		newPop = new population(popName, 0, label);
 		this.addPop(newPop,gen,pops);
 		
@@ -331,8 +336,8 @@ public class demography {
 	//recombine
 	public node[] recombineByIndex(int popIndex,double gen, double loc){
 		node newNode1,newNode2,aNode;
-		newNode1 = null;
-		newNode2 = null;
+		newNode1 = new node(0,0,0,0,0);
+		newNode2 = new node(0,0,0,0,0);//null nodes will not get changed in memory!
 		node[] returnNodes = null;
 		population aPop;
 		int nodeIndex,nr;
@@ -354,11 +359,17 @@ public class demography {
 		nodeIndex = (int) (cosiRand.randomNum.randomDouble()*aPop.getMembers().getNumMembers());
 		aNode = aPop.getNode(nodeIndex);
 		//step 2
-		nr = CoalescentMain.nodeFactory.nodeRecombine(aNode, newNode1, newNode2, gen, loc);
+		Object[] returnArray= CoalescentMain.nodeFactory.nodeRecombine(aNode, newNode1, newNode2, gen, loc);
+		//if(returnArray[0]instanceof Integer ){
+		nr = (int) returnArray[0];//playing fasy and loose with casting
+		
+		//}
 		//step 3
 		if(nr ==2){
+			newNode1 = (node) returnArray[1];
+			newNode2 = (node) returnArray[2];
 			//step 4
-			aPop.removeNode(aNode);
+
 			//step 5
 			aPop.addNode(newNode1);
 			aPop.addNode(newNode2);
@@ -376,7 +387,7 @@ public class demography {
 		else return null;
 	}
 	// gene conversion
-	public  node[] gcByIndex(int popIndex,double gen, double loc, double locend){
+	public  node[] gcByIndex(int popIndex,double gen, Double loc, Double locend){
 		node newNode1,newNode2,aNode;
 		newNode1 = new node(0,0,0,0,0);
 		newNode2 = new node(0,0,0,0,0);
@@ -573,6 +584,9 @@ public class demography {
 		node aNode,aNode2,aNode3;
 		double double1,loc,loc2;
 		String string1,out;
+		try{
+		FileWriter outFile = new FileWriter(logFile,true);
+		
 		switch(type){
 		case ADD_NODE:
 			aNode = (node) args[0];
@@ -581,6 +595,8 @@ public class demography {
 				 
 				out = "" + gen +  "\t Add \t node:" + aNode.getName() + " pop: " + aPop.getPopName() + "\n";
 				//write to file
+				outFile.write(out);
+				outFile.close();
 			}
 			break;
 		case CHANGE_SIZE:
@@ -589,7 +605,8 @@ public class demography {
 			
 			if(outPutFile != null){
 				out = "" + gen + "\t" + "CHANGE_SIZE" + " \t pop: " + aPop.getPopName() + "\t size: "+ aPop.getPopSize() + "\n";
-
+				outFile.write(out);
+				outFile.close();
 			}
 			break;
 		
@@ -602,6 +619,8 @@ public class demography {
 			if(outPutFile != null){
 				out = "" + gen + "\t C \t" + aNode.getName() + " " + aNode2.getName() + " -> " + aNode3.getName() + " pop: " + aPop.getPopName() + "\n";
 				//write to file 
+				outFile.write(out);
+				outFile.close();
 			}
 			break;
 		
@@ -611,6 +630,8 @@ public class demography {
 			if(outPutFile != null){
 				out = "" + gen + "\tCreate_pop\tpop:" + aPop.getPopName() + "size: " + aPop.getPopSize() + "\n";
 				// write to file
+				outFile.write(out);
+				outFile.close();
 				
 			}
 			break;
@@ -623,12 +644,15 @@ public class demography {
 				if(outPutFile !=null){
 				out = "" + gen + "\tD\t" + aNode.getName() + " -> " + aNode3.getName() + " | " + aNode2.getName() + " " + aNode2.getSegment().getBegin() + " " + aNode2.getSegment().getEnd() + "\n";
 				//write to file
+				outFile.write(out);
+				outFile.close();
 				}
 			}
 			else{
 				if (outPutFile!=null){
 					out = "" + gen + "\tD\t"+aNode.getName() + "\n";
-					
+					outFile.write(out);
+					outFile.close();
 				}
 			}
 			break;
@@ -643,9 +667,13 @@ public class demography {
 			if(aNode3 != null){
 				out = "" + gen + "\tG\t" + aNode.getName() + " -> " + aNode2.getName() + " " +aNode3.getName() + " " + aPop.getPopName() + " " + loc + " " + loc2 + "\n";
 				//write out
+				outFile.write(out);
+				outFile.close();
 			}
 			else{
 				out = "" + gen + "\tG\t" + aNode.getName() + " -> " + aNode2.getName() + " - " + aPop.getPopName() + " " + loc + " " + loc2 + " " ;
+				outFile.write(out);
+				outFile.close();
 				//write out
 			}
 			break;
@@ -653,6 +681,8 @@ public class demography {
 			// HISTORICAL string_descriptions
 			string1 = args[0].toString();
 			out = " " + gen + "\tH\t" + string1 + "\n";
+			outFile.write(out);
+			outFile.close();
 			break;
 		case MIG_RATE:
 			/* MIG_RATE from-pop to-pop new_rate */
@@ -664,6 +694,8 @@ public class demography {
 			
 			out = "" + gen + "\tmig_rate\t" + aPop.getPopName() + " " + aPop2.getPopName() + " " + double1 + "\n";
 			//write out 
+			outFile.write(out);
+			outFile.close();
 			break;
 		case RECOMBINE:
 			//Recombine oldNode1 oldNode2 newNode pop 
@@ -675,13 +707,22 @@ public class demography {
 			if(aNode3 != null){
 				out = "" + gen + "\tR\t" + aNode.getName() + " -> " + aNode2.getName() + " " + aNode3.getName() + " " + aPop.getPopName() + " " + loc + "\n";
 				//write out
+				outFile.write(out);
+				outFile.close();
 			}
 			else{
 				out = "" + gen + "\tR\t" + aNode.getName() + " -> " + aNode2.getName() + " - " + aPop.getPopName() + " " + loc + "\n";
 				//write out
+				outFile.write(out);
+				outFile.close();
 			}
 			break;
+			}
 		}
+		catch(Exception e){
+			e.printStackTrace();
+		}
+		
 	}
 	
 	
@@ -734,11 +775,13 @@ public class demography {
 		}
 	}
 	public void addPop( population newPop,double gen ,popList aPopList){
+		
 		popList tempPopList;
 		tempPopList = new popList();
 		tempPopList.setPop(newPop);
 		tempPopList.setNext(aPopList);
 		aPopList = tempPopList;//not sure this may need to return aPopList....
+		
 		pops = aPopList;
 		numPops ++;
 		dgLog(CREATE_POP , gen , newPop );
@@ -835,7 +878,7 @@ public class demography {
 		int i = 0;
 		siteList tempSites = recombSites;
 		if(rindex1 > numSites){
-			System.out.println("reCenter: rindex too long");
+			System.out.println("regCenter: rindex too long");
 			return 0;
 		}
 		while(i<rindex1 && tempSites != null){
@@ -845,7 +888,7 @@ public class demography {
 		if(tempSites != null && tempSites.getNext()!=null)
 			return (tempSites.getNext().getSite() + tempSites.getSite())/2;
 		else{
-			System.out.println("reCenter: something went wrong");
+			System.out.println("regCenter: something went wrong");
 			return 0;
 		}
 		
