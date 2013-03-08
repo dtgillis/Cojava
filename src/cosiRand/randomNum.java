@@ -2,6 +2,7 @@ package cosiRand;
 
 import java.lang.management.ManagementFactory;
 import java.util.Date;
+import java.util.Random;
 
 
 public class randomNum{
@@ -21,8 +22,13 @@ final static double  NDIV = (1+IMM1/NTAB);
 final static double EPS = 1.2e-12;
 final static double  RNMX = (1.0-EPS);
 static long randseed;
+static Random generator = new Random();
 public static double randomDouble(){
-	return ran2(randseed);
+	//return ran2(randseed);
+	Random generator = new Random();
+	return generator.nextDouble();
+	//seedRNG();
+	//return ran2(randseed);
 }
 public static void setRngSeed(long rseed){
 	randseed = rseed;
