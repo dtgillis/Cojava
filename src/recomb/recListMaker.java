@@ -83,7 +83,7 @@ public class recListMaker {
 	public double recombGetR(){
 		return recombRate;
 	}
-	public node[] recombExecute(double gen,int popIndex,double location){
+	public node[] recombExecute(double gen,int popIndex, Double location){
 		double loc;
 		double temp,temp1;
 		recombStructure tempRecomb = recombs;
@@ -95,7 +95,7 @@ public class recListMaker {
 		
 		while (tempRecomb != null && tempRecomb.startBase < length && rr < temp){
 			if(tempRecomb.next==null|| tempRecomb.next.startBase > length){
-				rr += (length = tempRecomb.startBase)* tempRecomb.rate;
+				rr += (length - tempRecomb.startBase)* tempRecomb.rate;
 			}
 			else{
 				rr += (tempRecomb.next.startBase - tempRecomb.startBase) * tempRecomb.rate;
@@ -104,7 +104,9 @@ public class recListMaker {
 				tempRecomb = tempRecomb.next;
 			}
 		}
-		if(tempRecomb.next == null || tempRecomb.next.startBase > length)
+		if(tempRecomb == null){end = length;}
+		
+		else if(tempRecomb.next == null || tempRecomb.next.startBase > length)
 			end = length;
 		else end = tempRecomb.next.startBase;
 		
