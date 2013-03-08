@@ -48,6 +48,7 @@ public class demography {
 	public void initRecomb(){
 		recombSites = addRecombSite(0.0,null);
 		recombSites = addRecombSite(1.0,recombSites);
+		//recombSites.getNext().setNNode(1);
 		numSites = 1; 
 		
 	}
@@ -62,8 +63,6 @@ public class demography {
 	}
 	public siteList addRecombSite(double site, siteList aSiteList ) {
 		siteList newSiteList, thisList, lastList;
-		thisList = new siteList();
-		lastList = new siteList();
 			/* 1. check if site belongs at the top of the list.
 		   * 2. loop through list.
 		   * 3. check if site already exists in the list.
@@ -82,7 +81,7 @@ public class demography {
 			return newSiteList;
 		}
 		
-		thisList.setNext(aSiteList.getNext());
+		thisList = aSiteList.getNext();
 		lastList = aSiteList;
 		
 		while (thisList != null){
@@ -336,8 +335,8 @@ public class demography {
 	//recombine
 	public node[] recombineByIndex(int popIndex,double gen, double loc){
 		node newNode1,newNode2,aNode;
-		newNode1 = new node(0,0,0,0,0);
-		newNode2 = new node(0,0,0,0,0);//null nodes will not get changed in memory!
+		newNode1 = null;//new node(0,0,0,0,0);
+		newNode2 = null;//new node(0,0,0,0,0);//null nodes will not get changed in memory!
 		node[] returnNodes = null;
 		population aPop;
 		int nodeIndex,nr;
