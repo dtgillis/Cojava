@@ -107,7 +107,7 @@ public class demography {
 		newSiteList.setNNode(0);
 		lastList.setNext(newSiteList);
 		numSites++;
-		return aSiteList;
+		return lastList;
 	}
 	public popList deletePopByName(int popName,popList tempPopList){
 		
@@ -298,25 +298,7 @@ public class demography {
 					nodesAtLoc++;
 					
 				}
-				tSeg = aNode2.getSegment();
-				contains = false;
-				while(tSeg != null){
-					if(loc >= tSeg.getBegin()){
-						if(loc<= tSeg.getEnd()){
-							contains = true;
-							break;
-						}
-						tSeg = tSeg.getNext();
-					}
-					else{
-						contains = false;
-						break;
-					}
-				}
-				if(contains){
-					nodesAtLoc++;
-					
-				}
+				
 				if(nodesAtLoc>1){
 					siteTemp.setNNode(siteTemp.getNNode()-1);
 				}
@@ -368,7 +350,7 @@ public class demography {
 			newNode1 = (node) returnArray[1];
 			newNode2 = (node) returnArray[2];
 			//step 4
-
+			aPop.removeNode(aNode);
 			//step 5
 			aPop.addNode(newNode1);
 			aPop.addNode(newNode2);
@@ -527,8 +509,9 @@ public class demography {
 					for(int i = 0; i<aPop.getMembers().getNumMembers(); i++){
 						/* Unoptimized:*/
 						/* nodeptr = pop_get_node (i, &(popptr->members)); */
+						aNode = aPop.getNode(i);
 						/* Optimized, but fragile: */
-						aNode = aPop.getMembers().getNode(aPop.getMembers().getNumMembers()-i-1);
+						//aNode = aPop.getMembers().getNode(aPop.getMembers().getNumMembers()-i-1);
 						/* Start hardwired optimization (from seg_contains(), segment.c) */
 						tSeg = aNode.getSegment();
 						contains = false;
@@ -643,8 +626,10 @@ public class demography {
 				if(outPutFile !=null){
 				out = "" + gen + "\tD\t" + aNode.getName() + " -> " + aNode3.getName() + " | " + aNode2.getName() + " " + aNode2.getSegment().getBegin() + " " + aNode2.getSegment().getEnd() + "\n";
 				//write to file
+				System.out.println(out);
 				outFile.write(out);
 				outFile.close();
+				break;
 				}
 			}
 			else{
