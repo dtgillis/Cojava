@@ -17,6 +17,7 @@ public class fileReader {
 	String[] args;
 	boolean seeded = false;
 	private boolean debug = true;
+	int length;
 	public fileReader(ArgHandler aFileSet ){
 		fileSet = aFileSet;
 		
@@ -58,8 +59,8 @@ public class fileReader {
 		//process the param file
 		if(line.contains("length")){//length has to be set before recomb file
 			System.out.println(line);
-			CoalescentMain.simulator.simSetLength(Integer.parseInt(cleanString(line)[1]));
-			//also need gc_set_length
+			length = Integer.parseInt(cleanString(line)[1]);
+			CoalescentMain.simulator.simSetLength(length);
 		}
 		else if (line.contains("recomb_file")){
 			System.out.println(line);
@@ -69,7 +70,7 @@ public class fileReader {
 			System.out.println(line);
 			args = cleanString(line);
 			double mu =  Double.parseDouble(args[1]);
-			CoalescentMain.simulator.setTheta(mu);
+			CoalescentMain.simulator.setTheta(mu*length);
 			// set mutation rate in sim
 		}
 		else if (line.contains("infinite_sites")){
