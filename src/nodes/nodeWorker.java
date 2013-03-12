@@ -66,9 +66,10 @@ public class nodeWorker {
 	}
 	// this should probably also return the nodes instead? //also basically same function as above.
 	// gene conversion //
-	public int nodeGC(node aNode, node newNode1, node newNode2, double gen,
+	public Object[] nodeGC(node aNode, node newNode1, node newNode2, double gen,
 			double loc, double locend){
 		seg aSeg,seg1,seg2;
+		Object[] returnArray;
 		aSeg = new seg(loc,locend);
 		seg1 = segFactory.segIntersect(aNode.getSegment(), aSeg);
 		seg2 = segFactory.segIntersect(aNode.getSegment(), segFactory.segInverse(aSeg));
@@ -78,14 +79,20 @@ public class nodeWorker {
 				seg1 =null;
 			if(seg2!=null)
 				seg2 = null;
-			
-			return 1;
+			returnArray = new Object[1];
+			returnArray[0] = 1;
+			return returnArray;
 		}
+		returnArray = new Object[3];
 		newNode1 = makeEmptyNode(gen,aNode.getPop(),aNode);
 		newNode1.setSegment(seg1);
 		newNode2 = makeEmptyNode(gen,aNode.getPop(),aNode);
 		newNode2.setSegment(seg2);
-		return 2;
+		returnArray[0]=2;
+		returnArray[1]=newNode1;
+		returnArray[2]=newNode2;
+		
+		return returnArray;
 	}
 	
 	public Object[] nodeBreakOffSeg(node aNode, node newNode1, node newNode2,
