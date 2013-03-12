@@ -47,9 +47,9 @@ public class segWorker {
 	public seg segUnion(seg seg1, seg seg2){
 		double begin,end;
 		seg activeSeg,nextSeg,tempSeg,newSeg;
-		
+		newSeg = null;
 		if (seg1 != null && seg2 != null){
-			newSeg = null;
+			
 			if(seg1.begin<seg2.begin){
 				begin = seg1.begin;
 				end = seg1.end;
@@ -83,13 +83,33 @@ public class segWorker {
 		else if (activeSeg.end > end){
 			end = activeSeg.end;
 		}
+		while (activeSeg.getNext()!=null && nextSeg!=null){
+			if(activeSeg.getNext().getBegin() > nextSeg.getBegin()){
+				tempSeg = nextSeg;
+				nextSeg = activeSeg.getNext();
+				activeSeg = tempSeg;
+			}
+			else{
+				activeSeg = activeSeg.getNext();
+			}
+			//iff possible segment is disjoint add this segment and startover
+			if(activeSeg.getBegin()>end){
+				newSeg = this.segAdd(newSeg, begin, end);
+				begin = activeSeg.getBegin();
+				end = activeSeg.getEnd();
+			}
+			else if(activeSeg.getEnd()>end){
+				end = activeSeg.getEnd();
+			}
+			
+		}
 		//now either activeSeg.next is null or nextSeg is null
 		if(nextSeg != null){
 			activeSeg = nextSeg;
 		}
 		else activeSeg = activeSeg.next;
 		
-		while(activeSeg!= null){
+		while(activeSeg!= null ){
 			//first check if activeSeg.next overlaps the current begin/end
 			//then copy all of activeSeg to newSeg
 			if(activeSeg.begin > end){
