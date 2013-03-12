@@ -11,30 +11,28 @@ public class nodeWorker {
 		nodeIndex = 0;
 	}
 	public node makeNewNode(int begin,int end,double gen,int pop){
+		
 		node aNode = new node(begin, end, gen, pop, nodeIndex);
 		nodeIndex++;
 		return aNode;
 	}
 	
 	public node makeEmptyNode(double gen,int pop,node des1){
-		node aNode = new node(0,0, gen, pop,nodeIndex);
+		node aNode = new node( gen, pop,nodeIndex);
 		nodeIndex++;
-		//curNode.segment = null;
-		aNode.descendent[0] = null;
-		aNode.descendent[1] = des1;
+		aNode.descendent[0] = des1;
 		return aNode;
 	}
 	public node makeEmptyNode2(double gen, int pop, node des1,node des2){
-		node aNode = new node(0, 0, gen, pop, nodeIndex);
+		node aNode = new node(gen, pop, nodeIndex);
 		nodeIndex++;
 		aNode.descendent[0] = des1;
 		aNode.descendent[1] = des2;
-		//aNode.segment = null;
 		return aNode;
 	}
 	public node nodeCoalesce(node aNode1,node aNode2,double gen){
-		node newNode = makeEmptyNode2(gen,aNode1.pop,aNode1,aNode2);
-		newNode.segment = segFactory.segUnion(aNode1.segment, aNode2.segment);
+		node newNode = makeEmptyNode2(gen,aNode1.getPop(),aNode1,aNode2);
+		newNode.setSegment(segFactory.segUnion(aNode1.getSegment(), aNode2.getSegment()));
 		return newNode;
 	}
 	//this should probably return the nodes instead?
@@ -43,8 +41,8 @@ public class nodeWorker {
 		seg aSeg,seg1,seg2;
 		Object[] returnArray; //container for nodes to return....
 		aSeg = new seg(0,loc);
-		seg1 = segFactory.segIntersect(aNode.segment, aSeg);
-		seg2 = segFactory.segIntersect(aNode.segment,segFactory.segInverse(aSeg));
+		seg1 = segFactory.segIntersect(aNode.getSegment(), aSeg);
+		seg2 = segFactory.segIntersect(aNode.getSegment(),segFactory.segInverse(aSeg));
 		aSeg = null;
 		if(seg1 == null || seg2 == null){
 			if(seg1 != null )
@@ -57,9 +55,9 @@ public class nodeWorker {
 		}
 		returnArray = new Object[3];
 		newNode1 = makeEmptyNode(gen,aNode.pop, aNode);
-		newNode1.segment = seg1;
+		newNode1.setSegment(seg1);
 		newNode2 = makeEmptyNode(gen,aNode.pop,aNode);
-		newNode2.segment = seg2;
+		newNode2.setSegment(seg2);
 		returnArray[0] = 2;
 		returnArray[1] = newNode1;
 		returnArray[2] = newNode2;
@@ -75,7 +73,7 @@ public class nodeWorker {
 		seg1 = segFactory.segIntersect(aNode.getSegment(), aSeg);
 		seg2 = segFactory.segIntersect(aNode.getSegment(), segFactory.segInverse(aSeg));
 		aSeg = null;
-		if(seg1 ==null || seg2 == null){
+		if( seg1 ==null || seg2 == null ){
 			if(seg1!=null)
 				seg1 =null;
 			if(seg2!=null)
@@ -86,6 +84,7 @@ public class nodeWorker {
 		newNode1 = makeEmptyNode(gen,aNode.getPop(),aNode);
 		newNode1.setSegment(seg1);
 		newNode2 = makeEmptyNode(gen,aNode.getPop(),aNode);
+		newNode2.setSegment(seg2);
 		return 2;
 	}
 	
@@ -99,7 +98,7 @@ public class nodeWorker {
 		seg2 = segFactory.segIntersect(aNode.getSegment(), segFactory.segInverse(aSeg));
 		aSeg = null;
 		
-		if(seg1 == null || seg2 == null){
+		if(seg1 == null || seg2 == null ){
 			if(seg1 != null)
 				seg1 = null;
 			if(seg2 != null)
