@@ -35,20 +35,18 @@ public class demography {
 	final boolean DEMOG_DEBUG = true;
 	ranBinom randBinom;
 	
-	public demography(){
-		pops = new popList();
+	public demography(){//dg_initialize()
+		pops = null;
 		numPops = 0;
 		totMembers = 0;
 		completePop = new population(-1,0,"complete_nodes".toCharArray());
 		segFactory = new segWorker();
-//		nodeFactory = new nodeWorker();
 		randBinom = new ranBinom();
 
 	}
-	public void initRecomb(){
+	public void initRecomb(){//dg_init_recomb()
 		recombSites = addRecombSite(0.0,null);
 		recombSites = addRecombSite(1.0,recombSites);
-		//recombSites.getNext().setNNode(1);
 		numSites = 1; 
 		
 	}
@@ -58,7 +56,7 @@ public class demography {
 	public File getLogFile(){
 		return logFile;
 	}
-	public siteList getRecombSites(){
+	public siteList getRecombSites(){//dg_recombsites()
 		return recombSites;
 	}
 	public siteList addRecombSite(double site, siteList aSiteList ) {
@@ -107,7 +105,7 @@ public class demography {
 		newSiteList.setNNode(0);
 		lastList.setNext(newSiteList);
 		numSites++;
-		return lastList;
+		return aSiteList;
 	}
 	public popList deletePopByName(int popName,popList tempPopList){
 		
@@ -116,32 +114,35 @@ public class demography {
 			return null;
 		}
 		if(tempPopList.getPop().getPopName() == popName){
+			if(DEMOG_DEBUG) System.out.println(String.format("pop %s removed\n", tempPopList.getPop().getPopLabel()));
 			numPops--;
 			return tempPopList.getNext();
 		}
 		
-		tempPopList.setNext(deletePopByName(popName , tempPopList.getNext()));
+		tempPopList.setNext(this.deletePopByName(popName , tempPopList.getNext()));
 		return tempPopList;
 	}
 	public int addToCompletePopulation(node aNode,population aPop,double begin,double end){
-		node doneNode = null;//new node(0,0,0,0,0);
-		node contNode = null;// node(0,0,0,0,0);//have to not be null to track
+		node doneNode = null;
+		node contNode = null;
 		int numberOfNodes;
 		Object[] results = CoalescentMain.nodeFactory.nodeBreakOffSeg(aNode, doneNode, contNode , begin, end);
 		numberOfNodes = (int) results[0];
 		if(numberOfNodes == 2){
 			doneNode = (node) results[1];
 			contNode = (node) results[2];
-			completePop.addNode(doneNode);//not sure this will work...
+			completePop.addNode(doneNode);
 			aPop.removeNode(aNode);
 			aPop.addNode(contNode);
 			dgLog(DONE,aNode.getGen(),aNode,doneNode,contNode);
+			if(DEMOG_DEBUG)System.out.println(completePop.getNumNodes());
 			return 1;
 		}
 		else if(numberOfNodes == 1){
 			completePop.addNode(aNode);
 			aPop.removeNode(aNode);
 			dgLog(DONE,aNode.getGen(),aNode,doneNode,contNode);
+			if(DEMOG_DEBUG)System.out.println(completePop.getNumNodes());
 		}
 		return 0;
 				
@@ -156,7 +157,7 @@ public class demography {
 	 * 2. call dg_set_pop.. to set the population size
 	 * 3. (opt) call dg_populate_by_name to fill in the nodes
 	 */
-	public void createPop(int popName, char[] label,double gen){
+	public void createPop(int popName, char[] label,double gen){//dg_create_pop()
 		population newPop, tempPop;
 		/* check to make sure the popname is not taken and
 		 is non negative
@@ -172,9 +173,10 @@ public class demography {
 		newPop = new population(popName, 0, label);
 		this.addPop(newPop,gen,pops);
 		
+		
 	}
 	public void populateByName(int popName,int members, double gen){
-		population aPop = getPopByNameInt(popName,pops);
+		population aPop = this.getPopByNameInt(popName,pops);
 		node tempNode;
 		for(int i=0;i<members;i++){
 			tempNode = CoalescentMain.nodeFactory.makeNewNode(0, 1, gen, popName);
@@ -184,7 +186,7 @@ public class demography {
 		}
 		totMembers += members;
 	}
-	public int getNumPops(){
+	public int getNumPops(){//dg_get_num_pops()
 		return numPops;
 	}
 	public char[] getPopLabelByName(int popName){
@@ -202,12 +204,12 @@ public class demography {
 	}
 	// popsize functions
 	public int getPopSizeByIndex(int popIndex){
-		population aPop = getPopByIndex(popIndex);
+		population aPop = this.getPopByIndex(popIndex);
 		return aPop.getPopSize();
 	}
-	//return 0 is population does not exist....
+	//return 0 if population does not exist....
 	public int setPopSizeByName(double gen, int popName,int newSize){
-		population aPop = getPopByNameInt(popName,pops);
+		population aPop = this.getPopByNameInt(popName,pops);
 				if(aPop == null){
 					System.out.println("setPopSizeByName: Pop does not exist");
 					return 0;
@@ -222,9 +224,9 @@ public class demography {
 	}
 	//coalesce
 	public void coalesceByIndex(int popIndex,double gen){
-		population aPop = getPopByIndex(popIndex);
+		population aPop = this.getPopByIndex(popIndex);
 		assert(popIndex>=0);
-		coalesceByName(aPop.getPopName(), gen);
+		this.coalesceByName(aPop.getPopName(), gen);
 	}
 	public void coalesceByName(int popName,double gen){
 		population aPop;
@@ -242,10 +244,10 @@ public class demography {
 		 * 4. Add new node to population.
 		 * 5. Log it.
 		 */ 
-		aPop = getPopByNameInt(popName,pops);
+		aPop = this.getPopByNameInt(popName,pops);
 		//step 1
-		node1Index = (int)(cosiRand.randomNum.randomDouble()*aPop.getMembers().getNumMembers());
-		node2Index = (int)(cosiRand.randomNum.randomDouble()*aPop.getMembers().getNumMembers() - 1);
+		node1Index = (int)(CoalescentMain.random.randomDouble() *aPop.getMembers().getNumMembers());
+		node2Index = (int)(CoalescentMain.random.randomDouble() *aPop.getMembers().getNumMembers() - 1);
 		
 		if(node2Index >= node1Index) node2Index++;
 		aNode1 = aPop.getNode(node1Index);
@@ -317,8 +319,8 @@ public class demography {
 	//recombine
 	public node[] recombineByIndex(int popIndex,double gen, double loc){
 		node newNode1,newNode2,aNode;
-		newNode1 = null;//new node(0,0,0,0,0);
-		newNode2 = null;//new node(0,0,0,0,0);//null nodes will not get changed in memory!
+		newNode1 = null;
+		newNode2 = null;
 		node[] returnNodes = null;
 		population aPop;
 		int nodeIndex,nr;
@@ -335,16 +337,14 @@ public class demography {
 		 * 6. Add new recombination site.
 		 * 7. Log it.
 		 */
-		aPop = getPopByIndex(popIndex);
+		aPop = this.getPopByIndex(popIndex);
 		//step 1
-		nodeIndex = (int) (cosiRand.randomNum.randomDouble()*aPop.getMembers().getNumMembers());
+		nodeIndex = (int) (CoalescentMain.random.randomDouble() * aPop.getMembers().getNumMembers());
 		aNode = aPop.getNode(nodeIndex);
 		//step 2
 		Object[] returnArray= CoalescentMain.nodeFactory.nodeRecombine(aNode, newNode1, newNode2, gen, loc);
-		//if(returnArray[0]instanceof Integer ){
-		nr = (int) returnArray[0];//playing fasy and loose with casting
+		nr = (int) returnArray[0];//playing fast and loose with casting
 		
-		//}
 		//step 3
 		if(nr ==2){
 			newNode1 = (node) returnArray[1];
@@ -368,10 +368,10 @@ public class demography {
 		else return null;
 	}
 	// gene conversion
-	public  node[] gcByIndex(int popIndex,double gen, Double loc, Double locend){
+	public  node[] gcByIndex(int popIndex,double gen, double loc, double locend){
 		node newNode1,newNode2,aNode;
-		newNode1 = new node(0,0,0,0,0);
-		newNode2 = new node(0,0,0,0,0);
+		newNode1 = null;
+		newNode2 = null;
 		node[] returnNodes = null;
 		population aPop;
 		int nodeIndex,nr;
@@ -387,14 +387,17 @@ public class demography {
 		 * 6. Add two new recombination sites.
 		 * 7. Log it.
 		 */
-		aPop = getPopByIndex(popIndex);
+		aPop = this.getPopByIndex(popIndex);
 		//step 1
-		nodeIndex = (int) cosiRand.randomNum.randomDouble() * aPop.getMembers().getNumMembers();
+		nodeIndex = (int) CoalescentMain.random.randomDouble() * aPop.getMembers().getNumMembers();
 		aNode = aPop.getNode(nodeIndex);
 		//step 2
-		nr = CoalescentMain.nodeFactory.nodeGC(aNode, newNode1, newNode2, gen, loc, locend);
+		Object[] result = CoalescentMain.nodeFactory.nodeGC(aNode, newNode1, newNode2, gen, loc, locend);
+		nr = (int) result[0];
 		//step 3 
 		if(nr ==2){
+			newNode1 = (node) result[1];
+			newNode2 = (node) result[2];
 			//step 4
 			aPop.removeNode(aNode);
 			//step 5
@@ -422,10 +425,10 @@ public class demography {
 		population popFrom, popTo;
 		node tempNode;
 		int nodeIndex;
-		popFrom = getPopByNameInt(fromPop,pops);
-		popTo = getPopByNameInt(toPop,pops);
-		nodeIndex = (int) (cosiRand.randomNum.randomDouble()*popFrom.getNumNodes());
-		tempNode = popFrom.getMembers().getNode(nodeIndex);
+		popFrom = this.getPopByNameInt(fromPop,pops);
+		popTo = this.getPopByNameInt(toPop,pops);
+		nodeIndex = (int) (CoalescentMain.random.randomDouble()*popFrom.getNumNodes());
+		tempNode = popFrom.getNode(nodeIndex);
 		popFrom.removeNode(tempNode);
 		popTo.addNode(tempNode);
 		dgLog(MOVE,gen,tempNode,popFrom,popTo);
@@ -443,7 +446,7 @@ public class demography {
 		popTo = getPopByNameInt(toPop,pops);
 		numToMove = randBinom.ranbinom(popFrom.getNumNodes(), members);
 		for(int i=0;i<numToMove;i++){
-			nodeIndex = (int) (cosiRand.randomNum.randomDouble() * popFrom.getNumNodes());
+			nodeIndex = (int) (CoalescentMain.random.randomDouble() * popFrom.getNumNodes());
 			tempNode = popFrom.getNode(nodeIndex);
 			popFrom.removeNode(tempNode);
 			popTo.addNode(tempNode);
@@ -451,10 +454,10 @@ public class demography {
 		}
 	}
 	// node functions
-	public int getNumNodes(){
+	public int getNumNodes(){//dg_get_num_nodes
 		int total = 0;
 		for(int i = 0; i<numPops; i++)
-			{total = getNumNodesInPopByIndex(i);}
+			{total = getNumNodesInPopByIndex(i);}//should be plus = ?
 		return total;
 	}
 	public int getNumNodesInPopByIndex(int popIndex){
@@ -493,6 +496,7 @@ public class demography {
 				aPop=tempPop;
 			}
 		}
+		//System.out.println(aPop.getNumNodes());
 		if(nonEmptyPopCount>1)return false;
 		/* 
 		 * Now check each member of the last population and move
@@ -504,7 +508,7 @@ public class demography {
 		
 		if(aPop.getMembers().getNumMembers() > 1){
 			while (siteTemp.getNext() != null){
-				if(siteTemp.getNNode() ==1){
+				if(siteTemp.getNNode() == 1){
 					loc = (siteTemp.getSite() + siteTemp.getNext().getSite()) / 2;
 					for(int i = 0; i<aPop.getMembers().getNumMembers(); i++){
 						/* Unoptimized:*/
@@ -512,7 +516,7 @@ public class demography {
 						aNode = aPop.getNode(i);
 						/* Optimized, but fragile: */
 						//aNode = aPop.getMembers().getNode(aPop.getMembers().getNumMembers()-i-1);
-						/* Start hardwired optimization (from seg_contains(), segment.c) */
+						/*//Start hardwired optimization (from seg_contains(), segment.c) */
 						tSeg = aNode.getSegment();
 						contains = false;
 						while(tSeg!=null){
@@ -532,7 +536,7 @@ public class demography {
 						/* end optimization */
 						assert(contains = true);
 					}
-					addToCompletePopulation(tempNode,aPop,siteTemp.getSite(),siteTemp.getNext().getSite());
+					this.addToCompletePopulation(tempNode,aPop,siteTemp.getSite(),siteTemp.getNext().getSite());
 					siteTemp.setNNode(0);
 				}
 				siteTemp = siteTemp.getNext();
@@ -754,7 +758,7 @@ public class demography {
 		if(tempSites != null)
 			return tempSites.getSite();
 		else{
-			System.out.println("reBegin: something went wrong");
+			System.out.println("regBegin: something went wrong");
 			return 0;
 		}
 	}
@@ -766,7 +770,7 @@ public class demography {
 		tempPopList.setNext(aPopList);
 		aPopList = tempPopList;//not sure this may need to return aPopList....
 		
-		pops = aPopList;
+		//pops = aPopList;
 		numPops ++;
 		dgLog(CREATE_POP , gen , newPop );
 	}
@@ -776,7 +780,7 @@ public class demography {
 	/////Population stuff/////
 	
 	public population getPopByName(int popName){
-		return getPopByNameInt(popName,pops);
+		return this.getPopByNameInt(popName,pops);
 	}
 	public population getPopByNameInt(int index1, popList aPopList){
 		popList temp = aPopList;
@@ -788,7 +792,7 @@ public class demography {
 		return null;
 	}
 	public int getPopNameByIndex(int popIndex){
-		return getPopByIndex(popIndex).getPopName();
+		return this.getPopByIndex(popIndex).getPopName();
 	}
 	
 	public int getPopIndexByName(int popName){
@@ -804,7 +808,7 @@ public class demography {
 		return -1;
 	}
 	public population getPopByIndex(int index1){
-		return getPopFromList(index1,pops);
+		return this.getPopFromList(index1,pops);
 	}
 	
 	public population getPopFromList(int index1 , popList aPopList){
@@ -814,7 +818,7 @@ public class demography {
 		else if (index1 == 0){
 			return aPopList.getPop();
 		}
-		else return getPopFromList(index1-1,aPopList.getNext());
+		else return this.getPopFromList(index1-1,aPopList.getNext());
 	}
 	
 		
@@ -827,11 +831,11 @@ public class demography {
 		
 		//since there is only one population;
 		pop = completePop;
-		loc = regCenter(regionNum);
-		for(int i=0;i<pop.getNumNodes();i++){
+		loc = this.regCenter(regionNum);
+		for(int i=0;i<pop.getMembers().getNumMembers();i++){
 			aNode = pop.getNode(i);
 				if(segFactory.segContains(aNode.getSegment(), loc)){
-					return reCurseHeadNode(aNode,loc);
+					return this.reCurseHeadNode(aNode,loc);
 				}
 		}
 		
@@ -878,11 +882,11 @@ public class demography {
 		
 	}
 	public double  totalTreeTime(int rindex1){
-		double point = regCenter(rindex1);
-		node tempNode = getHeadNode(rindex1);
+		double point = this.regCenter(rindex1);
+		node tempNode = this.getHeadNode(rindex1);
 		double totalTime = 0;
-		totalTime += calcTimeInBranch(point,tempNode.getGen(),tempNode.getDescendents()[0]);
-		totalTime += calcTimeInBranch(point,tempNode.getGen(),tempNode.getDescendents()[1]);
+		totalTime += this.calcTimeInBranch(point,tempNode.getGen(),tempNode.getDescendents()[0]);
+		totalTime += this.calcTimeInBranch(point,tempNode.getGen(),tempNode.getDescendents()[1]);
 		return totalTime;
 		
 	}
