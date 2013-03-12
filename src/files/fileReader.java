@@ -48,7 +48,7 @@ public class fileReader {
 			}
 		stream.close();
 		if(!seeded){
-			System.out.println(String.format("coalescent seed: %d\n", -1 * cosiRand.randomNum.seedRNG()));
+			System.out.println(String.format("coalescent seed: %d\n", -1 * CoalescentMain.random.seedRNG()));
 		}
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
@@ -135,7 +135,7 @@ public class fileReader {
 			args = cleanString(line);
 			if(Double.parseDouble(args[1])>0){
 				long rseed = -1*Long.parseLong(args[1]);
-				cosiRand.randomNum.setRngSeed(rseed);
+				CoalescentMain.random.setRngSeed(rseed);
 				
 			}
 		}

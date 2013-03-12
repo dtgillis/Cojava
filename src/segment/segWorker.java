@@ -71,7 +71,7 @@ public class segWorker {
 		}
 		else{
 			System.out.println("segUnion: you did something wrong - null segment");
-			//System.exit(0);
+			System.exit(0);
 			return null;
 		}
 		// updating begin/end using activeSeg

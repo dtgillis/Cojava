@@ -13,7 +13,7 @@ public class mutations {
 	double location;
 	node ancNode1,ancNode2;
 	mutNodeList mutNodes;
-	boolean MUTATE_DEBUG = false;
+	boolean MUTATE_DEBUG = true;
 	public mutations(){
 		
 	}
@@ -91,28 +91,28 @@ public class mutations {
 	node mutateRecurse(node aNode,double ratio,mutations newMuts,double treeAge,double threshold,double loc){
 		node mutateNode = null;
 		segWorker segFactory = new segWorker();
-		if(aNode.getDescendents()[0]!= null){
-			if(segFactory.segContains(aNode.getDescendents()[0].getSegment(), loc)){
-				ratio += (double)(aNode.getGen() - aNode.getDescendents()[0].getGen())/treeAge;
+		if(aNode.getDescendents()[1]!= null){
+			if(segFactory.segContains(aNode.getDescendents()[1].getSegment(), loc)){
+				ratio += (double)(aNode.getGen() - aNode.getDescendents()[1].getGen())/treeAge;
 				if(ratio > threshold){
 					newMuts.setAncNode1(aNode);
-					newMuts.setAncNode2(aNode.getDescendents()[0]);
-					return aNode.getDescendents()[0];
+					newMuts.setAncNode2(aNode.getDescendents()[1]);
+					return aNode.getDescendents()[1];
 				}
-				mutateNode = mutateRecurse(aNode.getDescendents()[0],ratio,newMuts,treeAge,threshold,loc);
+				mutateNode = mutateRecurse(aNode.getDescendents()[1],ratio,newMuts,treeAge,threshold,loc);
 				if(mutateNode != null) return mutateNode;
 				//this happens if we place a mutation inside this recursion
 			}
 		}
 		else return null;
-		if((aNode.getDescendents()[1]!= null)&& (segFactory.segContains(aNode.getDescendents()[1].getSegment(), loc))){
+		if((aNode.getDescendents()[0]!= null)&& (segFactory.segContains(aNode.getDescendents()[0].getSegment(), loc))){
 			ratio += (double)(aNode.getGen() - aNode.getDescendents()[1].getGen())/treeAge;
 			if(ratio>threshold){
 				newMuts.setAncNode1(aNode);
-				newMuts.setAncNode2(aNode.getDescendents()[1]);
-				return aNode.getDescendents()[1];
+				newMuts.setAncNode2(aNode.getDescendents()[0]);
+				return aNode.getDescendents()[0];
 			}
-			mutateNode = mutateRecurse(aNode.getDescendents()[1],ratio,newMuts,treeAge,threshold,loc);
+			mutateNode = mutateRecurse(aNode.getDescendents()[0],ratio,newMuts,treeAge,threshold,loc);
 			if(mutateNode!=null)return mutateNode;
 			//this happens if we place a mutation inside this recursion
 		}

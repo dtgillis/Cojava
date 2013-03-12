@@ -770,7 +770,7 @@ public class demography {
 		tempPopList.setNext(aPopList);
 		aPopList = tempPopList;//not sure this may need to return aPopList....
 		
-		//pops = aPopList;
+		pops = aPopList;
 		numPops ++;
 		dgLog(CREATE_POP , gen , newPop );
 	}

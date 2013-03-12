@@ -17,7 +17,7 @@ public class node {
 		descendent[0] = null;
 		descendent[1] = null;
 		segment = null;
-		segFactory.segAdd(segment, begin, end);
+		segment = segFactory.segAdd(segment, begin, end);
 		gen = aGen;
 		pop = aPop;
 		name = aName;

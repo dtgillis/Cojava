@@ -2,6 +2,8 @@ package coalescent;
 
 import java.io.IOException;
 
+import cosiRand.randomNum;
+
 import nodes.nodeWorker;
 import coalesce.coalesce;
 import recomb.recListMaker;
@@ -33,7 +35,11 @@ public class CoalescentMain {
 	public static coalesce coalesce;
 	public static migrationWorker migFactory;
 	public static nodeWorker nodeFactory;
+	public static mutations mutate;
+	public static randomNum random;
 	public static void main(String[] args) {
+		mutate = new mutations();
+		random = new randomNum();
 		haps = new hap();
 		simulator = new sim();
 		migFactory = new migrationWorker();

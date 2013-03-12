@@ -1,10 +1,13 @@
 package cosiRand;
 
+import java.security.SecureRandom;
 import java.util.Random;
 
+import coalescent.CoalescentMain;
+
 public class poisson {
-	static Random generator = new Random();
-	public static int poission(double xm){
+	 Random generator = new Random();
+	public  int poission(double xm){
 		double em,t,y,sq = 0,alxm = 0,g = 0,oldm;
 		oldm = -1.0;
 		if(xm<12.0){
@@ -39,19 +42,22 @@ public class poisson {
 		return (int) (em+.5);
 		
 	}
-	public static double poissonGetNext(double rate){
-		//double ed;
+	public  double poissonGetNext(double rate){
+		double ed;
 		if(rate ==0) return -1;
 		//ed = expDev();
-		return (expDev()/rate);
+		ed = expDev();
+		return (ed/rate);
 		
 	}
-	private static double expDev(){
+	private  double expDev(){
 		double dum = 0;
-		while(dum == 0.0){
-			dum = (double) 1 - generator.nextDouble();
-		}
-		return - Math.log(dum);
+			//SecureRandom generator = new SecureRandom();
+		double rand = 	CoalescentMain.random.randomDouble();
+		dum = (double) 1 - rand;
+		
+		double returner = - Math.log(dum);
+		return returner;
 	}
 	
 }

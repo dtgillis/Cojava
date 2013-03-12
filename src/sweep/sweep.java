@@ -57,7 +57,7 @@ public class sweep {
 		alpha = 2 * aPop.getPopSize() * selCoeff;
 		
 		for( int inode = 0; inode<aPop.getMembers().getNumMembers();inode++){
-			if(!dorandom || cosiRand.randomNum.randomDouble() < finalSelFreq){
+			if(!dorandom || CoalescentMain.random.randomDouble() < finalSelFreq){
 				selNodes[nsel] = aPop.getMembers().getNode(inode);
 				nsel++;
 			}
@@ -91,7 +91,7 @@ public class sweep {
 			allProb = 0;
 			allProb += probCoalUnsel + probCoalSel + probRecomb + probGc;
 			
-			x = cosiRand.randomNum.randomDouble();
+			x = CoalescentMain.random.randomDouble();
 			
 			if(allProb >= x ){
 				if(x < probRecomb/allProb){
@@ -131,7 +131,7 @@ public class sweep {
 						if(!foundIt)System.out.println(String.format("Could not find %d\n", recNodes[0].getName()));
 						assert(foundIt);
 				/* Decide whether the chrom that we've recombined onto is selected or unselected */
-						if(cosiRand.randomNum.randomDouble() < selFreq){
+						if(CoalescentMain.random.randomDouble() < selFreq){
 							if(nsel ==selSize){
 							selSize *=2;// new sized node array of this size 
 							node[] tempArr = new node [selSize];
@@ -210,7 +210,7 @@ public class sweep {
 						
 						
 						/* Decide whether the chrom that we've recombined onto is selected or unselected */
-						if(cosiRand.randomNum.randomDouble() < selFreq){
+						if(CoalescentMain.random.randomDouble() < selFreq){
 							if(nsel == selSize){
 								selSize *=2;// new sized node array of this size 
 								node[] tempArr = new node [selSize];
@@ -270,8 +270,8 @@ public class sweep {
 		double loc;
 		seg tSeg;
 		//step 1
-		node1Index = (int)(cosiRand.randomNum.randomDouble() * nnode);
-		node2Index = (int)(cosiRand.randomNum.randomDouble() * (nnode -1));
+		node1Index = (int)(CoalescentMain.random.randomDouble() * nnode);
+		node2Index = (int)(CoalescentMain.random.randomDouble() * (nnode -1));
 		if(node2Index >= node1Index)node2Index ++;
 		aNode1 = nodes[node1Index];
 		aNode2 = nodes[node2Index];
@@ -392,7 +392,7 @@ public class sweep {
 			totProb += (double)(numNodes * (numNodes =1))/(4*popSize);
 			
 		}
-		randCounter = cosiRand.randomNum.randomDouble() * totProb;
+		randCounter = CoalescentMain.random.randomDouble() * totProb;
 		
 		sumProb = 0;
 		for(i = 0;i<numPops;i++){
@@ -420,7 +420,7 @@ public class sweep {
 			if(thisPop == selPopName){continue;}
 			totNodes += CoalescentMain.dem.getNumNodesInPopByIndex(i);
 		}
-		randCounter = totNodes * cosiRand.randomNum.randomDouble();
+		randCounter = totNodes * CoalescentMain.random.randomDouble();
 		assert(randCounter <= totNodes);
 		
 		//weight pops by numNodes
@@ -443,7 +443,7 @@ public class sweep {
 		return poissonRate;
 	}
 	public void swDoPoisson(int selPopName,double gen){
-		double randDouble = cosiRand.randomNum.randomDouble();
+		double randDouble = CoalescentMain.random.randomDouble();
 		double dum = 0,dum2 = 0;
 		int recombPop;
 		if(randDouble<(recombRate/poissonRate)){
