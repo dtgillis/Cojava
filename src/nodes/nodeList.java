@@ -25,7 +25,7 @@ public class nodeList {
 	public void removeNode(node aNode){
 		
 		for(int i=0;i<nodes.size();i++){
-			if(nodes.get(i).name == aNode.name){
+			if(nodes.get(i).getName() == aNode.getName()){
 				nodes.remove(i);
 				numMembers--;
 				return;
