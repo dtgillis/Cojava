@@ -7,18 +7,24 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 
+import pointers.doublePointer;
+
+import cosiRand.poisson;
+
 import mutate.mutList;
-import mutate.mutations;
+//import mutate.mutations;
 
 import coalescent.CoalescentMain;
 
 public class sim {
 		double coalesceRate,migrateRate,geneConvRate,recombRate,poissonRate,theta;
 		int fixedNumMut;
-		final boolean DEBUG = true;
+		poisson poissoner;
+		final boolean DEBUG = false;
 		
 		public sim(){
 			fixedNumMut = -1;
+			poissoner =  new poisson();
 		}
 		public void simSetLength(int l){
 			CoalescentMain.recomb.setLength(l);
@@ -44,9 +50,9 @@ public class sim {
 				historicalEventTime = (double) simGetHistEvent(gen);
 				poissonEventTime = this.simGetPoisEvent();
 				if(DEBUG){
-					System.out.println(String.format("recomb: %f coalesce: %f migrate: %f geneconvert: %f \n",
-							recombRate,coalesceRate,migrateRate,geneConvRate));
-					System.out.println(String.format("poisson time: %f, hist time: %f\n",poissonEventTime,historicalEventTime));
+					//System.out.println(String.format("recomb: %f coalesce: %f migrate: %f geneconvert: %f \n",
+					//		recombRate,coalesceRate,migrateRate,geneConvRate));
+					System.out.println(String.format("poisson time: %f, hist time: %f",poissonEventTime,historicalEventTime));
 				}
 				if(historicalEventTime < 0 || poissonEventTime < historicalEventTime){
 					gen += poissonEventTime;
@@ -109,13 +115,13 @@ public class sim {
 			}
 			for(reg=0;reg<numRegions;reg++){
 				begin = CoalescentMain.dem.regBegin(reg);
+				
 				if(fixedNumMut==-1){
 					mutrate = theta * treeTime[reg] * reglen[reg];
-					numMuts = cosiRand.poisson.poission(mutrate);
-					if(aFile.canWrite()){
+					numMuts = poissoner.poission(mutrate);
 						out.write(String.format("> [%f,  %f]  time %d E[muts] = %f (%d)\n",
 								begin,reglen[reg],(int)treeTime[reg],mutrate,numMuts));
-					}
+				
 				}
 					
 				else{ 
@@ -128,9 +134,9 @@ public class sim {
 				}
 				summut += numMuts;
 				for(i=0;i<numMuts;i++){
-					loc = begin + cosiRand.randomNum.randomDouble()*reglen[reg];
-					randMark = cosiRand.randomNum.randomDouble();
-					new mutations().mutateFindAndPrint(aFile, reg, loc, randMark, treeTime[reg], aMutList, aHap);
+					loc = begin + CoalescentMain.random.randomDouble()*reglen[reg];
+					randMark = CoalescentMain.random.randomDouble();
+					CoalescentMain.mutate.mutateFindAndPrint(aFile, reg, loc, randMark, treeTime[reg], aMutList, aHap);
 				}
 			}
 			return numMuts;
@@ -149,13 +155,13 @@ public class sim {
 			return CoalescentMain.histFactory.historicalGetNext(gen);
 		}
 		public double simGetPoisEvent(){
-			return cosiRand.poisson.poissonGetNext(this.simGetPoissonRate());
+			return poissoner.poissonGetNext(this.simGetPoissonRate());
 		}
 		public boolean simDoPoisson(double gen){
 			boolean didCoal = false;
-			double randDouble = cosiRand.randomNum.randomDouble();
-			Double dum = new Double(0);
-			Double dum2 = new Double(0);
+			double randDouble = CoalescentMain.random.randomDouble();
+			doublePointer dum =new doublePointer();
+			doublePointer dum2 = new doublePointer();
 			int popIndex;
 			if(randDouble < recombRate /poissonRate){
 				popIndex = CoalescentMain.recomb.recombPickPopIndex();
