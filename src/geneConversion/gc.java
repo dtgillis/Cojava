@@ -1,5 +1,6 @@
 package geneConversion;
 
+import pointers.doublePointer;
 import nodes.node;
 import cosiRand.ranBinom;
 import coalescent.CoalescentMain;
@@ -47,7 +48,7 @@ public class gc {
 	public int pickPopIndex(){
 		//figure out which pop to recombine
 		int popIndex = 0;
-		double randCounter = cosiRand.randomNum.randomDouble() * lastGCRate;//maybe need to call Random class instead less memory?
+		double randCounter = CoalescentMain.random.randomDouble() * lastGCRate;
 		int numPops = CoalescentMain.dem.getNumPops();
 		int numNodes;
 		double rate = 0;
@@ -63,19 +64,18 @@ public class gc {
 		}
 		return popIndex;
 	}
-	public node[] execute(double gen , int popIndex,Double location1,Double location2){
+	public node[] execute(double gen , int popIndex,doublePointer location1,doublePointer location2){
 		double loc,loc2;
 		double temp,temp1;
 		//choosing location..
-		temp1 = cosiRand.randomNum.randomDouble();
+		temp1 = CoalescentMain.random.randomDouble();
 		temp = (double) (temp1*gcRate);
 		loc = (double) ((int)(temp/gcRate*(length + gcLength) - gcLength)) / length ;
 		loc2 = (double) ((int)(temp/gcRate * (length + gcLength)))/length;
 		
 		if(loc2>length) loc2 = length;
-		location1 = loc;
-		location2 = loc2;//the passing of these locations as memory may need to be addressed
-		
+		location1.setDouble(loc);
+		location2.setDouble(loc2);		
 		return CoalescentMain.dem.gcByIndex(popIndex, gen, loc, loc2);
 	}
 }
