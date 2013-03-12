@@ -3,19 +3,24 @@ package geneConversion;
 import pointers.doublePointer;
 import nodes.node;
 import cosiRand.ranBinom;
+import cosiRand.randomNum;
 import coalescent.CoalescentMain;
+import demography.demography;
 
 public class gc {
-	ranBinom random;
 	double geneConversionRate,gcRate,lastGCRate;
 	int length,gcLength;
 	final boolean  DEBUG = true;
-	public gc(){
+	randomNum random;
+	demography dem;
+	public gc(demography adem, randomNum aRNG){
 		geneConversionRate = 0;
 		gcRate = 0;
 		lastGCRate = 0;
 		gcLength = 500; //in bp
 		//random = new ranBinom();
+		dem = adem;
+		random = aRNG;
 	}
 	public void setGCRate(double gcr){
 		geneConversionRate = gcr;
@@ -33,13 +38,13 @@ public class gc {
 		return gcRate;
 	}
 	public double getRate(){
-		int numPops = CoalescentMain.dem.getNumPops();
+		int numPops = dem.getNumPops();
 		double rate = 0;
 		int numNodes;
 		if(gcRate==0)return 0;
 		
 		for(int i = 0;i<numPops;i++){
-			numNodes = CoalescentMain.dem.getNumNodesInPopByIndex(i);
+			numNodes = dem.getNumNodesInPopByIndex(i);
 			rate += (numNodes * gcRate);
 		}
 		lastGCRate = rate;
@@ -48,15 +53,15 @@ public class gc {
 	public int pickPopIndex(){
 		//figure out which pop to recombine
 		int popIndex = 0;
-		double randCounter = CoalescentMain.random.randomDouble() * lastGCRate;
-		int numPops = CoalescentMain.dem.getNumPops();
+		double randCounter = random.randomDouble() * lastGCRate;
+		int numPops = dem.getNumPops();
 		int numNodes;
 		double rate = 0;
 		int i;
 		//weight pops by numNodes
 		if(numPops>1){
 			for( i = 0; i<numPops&&rate<randCounter;i++){
-				numNodes = CoalescentMain.dem.getNumNodesInPopByIndex(i);
+				numNodes = dem.getNumNodesInPopByIndex(i);
 				rate += (numNodes * gcRate);
 				//don't need this multiplication // comment in original code....
 			}
@@ -68,7 +73,7 @@ public class gc {
 		double loc,loc2;
 		double temp,temp1;
 		//choosing location..
-		temp1 = CoalescentMain.random.randomDouble();
+		temp1 = random.randomDouble();
 		temp = (double) (temp1*gcRate);
 		loc = (double) ((int)(temp/gcRate*(length + gcLength) - gcLength)) / length ;
 		loc2 = (double) ((int)(temp/gcRate * (length + gcLength)))/length;
@@ -76,6 +81,6 @@ public class gc {
 		if(loc2>length) loc2 = length;
 		location1.setDouble(loc);
 		location2.setDouble(loc2);		
-		return CoalescentMain.dem.gcByIndex(popIndex, gen, loc, loc2);
+		return dem.gcByIndex(popIndex, gen, loc, loc2);
 	}
 }

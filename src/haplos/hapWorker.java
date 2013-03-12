@@ -3,26 +3,29 @@ package haplos;
 import java.util.ArrayList;
 
 import coalescent.CoalescentMain;
+import demography.demography;
 import pop.population;
 
 public class hapWorker {
 	hap haplos;
+	demography dem;
 	final int INIT_SIZE = 100;
-	public hapWorker(hap aHap){	
+	public hapWorker(hap aHap, demography adem){	
 		haplos = aHap;
+		dem = adem;
 	}
 	public void hapAssignChroms(){
 		population aPop;
 		int npop,nchr,chromIndex,popName;
 		int running = 0;
-		npop = CoalescentMain.dem.getNumPops();
+		npop = dem.getNumPops();
 		haplos.setnPop(npop);
 		haplos.setPopId(new int[npop]);
 		assert(haplos.getPopId()!=null);
 		
 		for(int ipop = 0 ;ipop<npop;ipop++){
-			running += CoalescentMain.dem.getNumNodesInPopByIndex(ipop);
-			haplos.setPopId(ipop,CoalescentMain.dem.getPopNameByIndex(ipop));
+			running += dem.getNumNodesInPopByIndex(ipop);
+			haplos.setPopId(ipop,dem.getPopNameByIndex(ipop));
 			
 		}
 		
@@ -38,7 +41,7 @@ public class hapWorker {
 		
 		running = 0;
 		for(int ipop = 0;ipop<npop; ipop++){
-			aPop = CoalescentMain.dem.getPopByIndex(ipop);
+			aPop = dem.getPopByIndex(ipop);
 			nchr = aPop.getNumNodes();
 			popName = aPop.getPopName();//not sure this is needed?
 			for(int i = 0;i<nchr;i++){

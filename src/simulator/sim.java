@@ -1,6 +1,8 @@
 package simulator;
 
+import geneConversion.gc;
 import haplos.hap;
+import historical.histWorker;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -8,27 +10,51 @@ import java.io.FileWriter;
 import java.io.IOException;
 
 import pointers.doublePointer;
+import recomb.recListMaker;
 
 import cosiRand.poisson;
+import cosiRand.randomNum;
 
+import migration.migrationWorker;
 import mutate.mutList;
+import mutate.mutations;
 //import mutate.mutations;
 
+import coalesce.coalesce;
 import coalescent.CoalescentMain;
+import demography.demography;
 
 public class sim {
 		double coalesceRate,migrateRate,geneConvRate,recombRate,poissonRate,theta;
 		int fixedNumMut;
 		poisson poissoner;
 		final boolean DEBUG = false;
+		demography dem;
+		gc geneConversion;
+		recListMaker recomb;
+		randomNum random;
+		histWorker histFactory;
+		coalesce coalesce;
+		migrationWorker migFactory;
+		mutations mutate;
 		
-		public sim(){
+		
+		public sim(demography adem, poisson aPois, gc aGeneConverter,recListMaker aRecomb,randomNum aRNG,histWorker aHistFact,
+					coalesce aCoal,migrationWorker aMigFactory,mutations aMutate){
 			fixedNumMut = -1;
-			poissoner =  new poisson();
+			poissoner = aPois;
+			dem = adem;
+			geneConversion = aGeneConverter;
+			recomb = aRecomb;
+			random = aRNG;
+			histFactory = aHistFact;
+			coalesce = aCoal;
+			migFactory = aMigFactory;
+			mutate = aMutate;
 		}
 		public void simSetLength(int l){
-			CoalescentMain.recomb.setLength(l);
-			CoalescentMain.geneConversion.setLength(l);
+			recomb.setLength(l);
+			geneConversion.setLength(l);
 		}
 		/* To execute the coalescent simulator:
 		 * 1. Calculate the times to the next historical and poisson events.
@@ -57,13 +83,13 @@ public class sim {
 				if(historicalEventTime < 0 || poissonEventTime < historicalEventTime){
 					gen += poissonEventTime;
 					coal = simDoPoisson(gen);
-					if(coal){completeFlag = CoalescentMain.dem.doneCoalescent();}
+					if(coal){completeFlag = dem.doneCoalescent();}
 					
 				}
 				else{
 					gen += historicalEventTime;
-					gen = CoalescentMain.histFactory.historicalEventExecute(gen);
-					completeFlag = CoalescentMain.dem.doneCoalescent();
+					gen = histFactory.historicalEventExecute(gen);
+					completeFlag = dem.doneCoalescent();
 				}
 				
 			}
@@ -96,13 +122,13 @@ public class sim {
 			int[] nMutByRegion = null;
 			FileWriter fileOut = new FileWriter(aFile.getName(),true);
 			BufferedWriter out = new BufferedWriter(fileOut);
-			numRegions = CoalescentMain.dem.getNumRegs();
+			numRegions = dem.getNumRegs();
 			// print mutate headers....
 			reglen = new double[numRegions];
 			treeTime = new double[numRegions];
 			for(reg= 0;reg<numRegions;reg++){
-				treeTime[reg] = CoalescentMain.dem.totalTreeTime(reg);
-				reglen[reg] = CoalescentMain.dem.getRegLength(reg);
+				treeTime[reg] = dem.totalTreeTime(reg);
+				reglen[reg] = dem.getRegLength(reg);
 				probSum += treeTime[reg] + reglen[reg];
 			}
 			if(fixedNumMut>0){
@@ -114,7 +140,7 @@ public class sim {
 				cosiRand.multiNom.multinom(numRegions, fixedNumMut, probRegion, nMutByRegion);
 			}
 			for(reg=0;reg<numRegions;reg++){
-				begin = CoalescentMain.dem.regBegin(reg);
+				begin = dem.regBegin(reg);
 				
 				if(fixedNumMut==-1){
 					mutrate = theta * treeTime[reg] * reglen[reg];
@@ -134,50 +160,50 @@ public class sim {
 				}
 				summut += numMuts;
 				for(i=0;i<numMuts;i++){
-					loc = begin + CoalescentMain.random.randomDouble()*reglen[reg];
-					randMark = CoalescentMain.random.randomDouble();
-					CoalescentMain.mutate.mutateFindAndPrint(aFile, reg, loc, randMark, treeTime[reg], aMutList, aHap);
+					loc = begin + random.randomDouble()*reglen[reg];
+					randMark = random.randomDouble();
+					mutate.mutateFindAndPrint(aFile, reg, loc, randMark, treeTime[reg], aMutList, aHap);
 				}
 			}
 			return numMuts;
 			
 		}
 		public double simGetPoissonRate(){
-			coalesceRate = CoalescentMain.coalesce.coalesceGetRate(); 
-			migrateRate = CoalescentMain.migFactory.migrateGetRate();
-			recombRate = CoalescentMain.recomb.recombGetRate();
-			geneConvRate = CoalescentMain.geneConversion.getRate();
+			coalesceRate = coalesce.coalesceGetRate(); 
+			migrateRate = migFactory.migrateGetRate();
+			recombRate = recomb.recombGetRate();
+			geneConvRate = geneConversion.getRate();
 			poissonRate = (double)(coalesceRate + migrateRate + recombRate + geneConvRate);
 			return poissonRate;
 			
 		}
 		public double simGetHistEvent(double gen){
-			return CoalescentMain.histFactory.historicalGetNext(gen);
+			return histFactory.historicalGetNext(gen);
 		}
 		public double simGetPoisEvent(){
 			return poissoner.poissonGetNext(this.simGetPoissonRate());
 		}
 		public boolean simDoPoisson(double gen){
 			boolean didCoal = false;
-			double randDouble = CoalescentMain.random.randomDouble();
+			double randDouble = random.randomDouble();
 			doublePointer dum =new doublePointer();
 			doublePointer dum2 = new doublePointer();
 			int popIndex;
 			if(randDouble < recombRate /poissonRate){
-				popIndex = CoalescentMain.recomb.recombPickPopIndex();
-				CoalescentMain.recomb.recombExecute(gen, popIndex, dum);//another pointer...
+				popIndex = recomb.recombPickPopIndex();
+				recomb.recombExecute(gen, popIndex, dum);//another pointer...
 			}
 			else if(randDouble < (recombRate + migrateRate)/poissonRate){
-				CoalescentMain.migFactory.migrateExecute(gen);
+				migFactory.migrateExecute(gen);
 			}
 			else if(randDouble < (recombRate + migrateRate + coalesceRate)/poissonRate){
-				popIndex = CoalescentMain.coalesce.coalescePickPopIndex();
-				CoalescentMain.dem.coalesceByIndex(popIndex, gen);
+				popIndex = coalesce.coalescePickPopIndex();
+				dem.coalesceByIndex(popIndex, gen);
 				didCoal = true;
 			}
 			else {
-				popIndex = CoalescentMain.geneConversion.pickPopIndex();
-				CoalescentMain.geneConversion.execute(gen, popIndex, dum, dum2);
+				popIndex = geneConversion.pickPopIndex();
+				geneConversion.execute(gen, popIndex, dum, dum2);
 			}
 			return didCoal;
 		}

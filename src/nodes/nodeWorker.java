@@ -5,10 +5,11 @@ import segment.segWorker;
 
 public class nodeWorker {
 	int nodeIndex;
-	segWorker segFactory = new segWorker();
+	segWorker segFactory;
 	
-	public nodeWorker(){
+	public nodeWorker(segWorker aSegFactory){
 		nodeIndex = 0;
+		segFactory = aSegFactory;
 	}
 	public node makeNewNode(int begin,int end,double gen,int pop){
 		

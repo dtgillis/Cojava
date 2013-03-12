@@ -2,14 +2,17 @@ package migration;
 
 import cosiRand.ranBinom;
 import coalescent.CoalescentMain;
+import demography.demography;
 
 public class migrationWorker {
 	migrateRate migrations;
-	static double lastRate;
+	double lastRate;
+	demography dem;
 	
-	public migrationWorker(){
+	public migrationWorker(demography adem){
 		lastRate = 0 ;
 		migrations = null;
+		dem = adem;
 	}
 	public void migrateAdd(int from, int to, double rate){
 		migrateRate newMigRate = new migrateRate();
@@ -49,8 +52,8 @@ public class migrationWorker {
 			lastRate = 0;
 		else{
 			while (tempMigRate!=null){
-				numNodes = CoalescentMain.dem.getNumNodesInPopByName(tempMigRate.getFromPop());
-				numNodes1 = CoalescentMain.dem.getNumNodesInPopByName(tempMigRate.getToPop());
+				numNodes = dem.getNumNodesInPopByName(tempMigRate.getFromPop());
+				numNodes1 = dem.getNumNodesInPopByName(tempMigRate.getToPop());
 				if(numNodes<0 || numNodes1 <0){
 					migrateDelete(tempMigRate.getFromPop(),tempMigRate.getToPop());
 					return migrateGetRate();
@@ -78,12 +81,12 @@ public class migrationWorker {
 		}
 		else{
 			while(tempMigRate !=null && rate<randCounter){
-				numNodes = CoalescentMain.dem.getNumNodesInPopByName(tempMigRate.getFromPop());
+				numNodes = dem.getNumNodesInPopByName(tempMigRate.getFromPop());
 				rate += numNodes*tempMigRate.getRate();
 				if(rate<randCounter)
 					tempMigRate = tempMigRate.getNext();
 				else
-					CoalescentMain.dem.migrateOneChrom(tempMigRate.getFromPop(),tempMigRate.getToPop(), gen);
+					dem.migrateOneChrom(tempMigRate.getFromPop(),tempMigRate.getToPop(), gen);
 				
 			}
 		}

@@ -1,12 +1,17 @@
 package sweep;
 
 import cosiRand.poisson;
+import cosiRand.randomNum;
 import coalescent.CoalescentMain;
+import demography.demography;
 import demography.siteList;
+import pointers.doublePointer;
 import pop.population;
+import recomb.recListMaker;
 import segment.seg;
 import nodes.node;
 import nodes.nodeWorker;
+import geneConversion.gc;
 import haplos.hap;
 import mutate.mutList;
 import mutate.mutations;
@@ -15,8 +20,19 @@ public class sweep {
 	mutList aMutList;
 	hap haplos;
 	double coalesceRate,migrateRate,recombRate,geneConvRate,poissonRate;
-	public sweep(){
-		
+	demography dem;
+	recListMaker recomb;
+	gc geneConversion;
+	randomNum random;
+	poisson poissoner;
+	nodeWorker nodeFactory;
+	public sweep(demography adem,recListMaker aRecomb,gc aGeneConverter,randomNum aRNG,poisson aPois,nodeWorker aNodeFactory){
+		random = aRNG;
+		geneConversion = aGeneConverter;
+		dem = adem;
+		recomb = aRecomb;
+		poissoner = aPois;
+		nodeFactory = aNodeFactory;
 	}
 	public void sweepInitMut(mutList ml,hap aHap){
 		aMutList = ml;
@@ -31,13 +47,17 @@ public class sweep {
 		node oldAlleleNode,newAlleleNode;
 		double deltaT, selFreq, epsilon, t, x, tEnd, alpha, rate;
 		double probCoalUnsel, probCoalSel, probRecomb, allProb;
-		double tsave, loc = 0, endShift=0., tNonsweep, poissonEventTime;
-		double probGc, loc1 = 0, loc2 = 0; //these may need to be objects since they are passed as pointers...
+		double tsave,  endShift=0., tNonsweep, poissonEventTime;
+		double probGc; 
 		int selSize, unselSize; 
+		doublePointer loc = new doublePointer();
+		doublePointer loc1,loc2;
+		loc1 = new doublePointer();
+		loc2 = new doublePointer();
 		boolean dorandom=true;
 		mutations aMut;
 		
-		aPop = CoalescentMain.dem.getPopByName(popName);
+		aPop = dem.getPopByName(popName);
 		nunsel = nsel = 0;
 		selSize = unselSize = aPop.getMembers().getNumMembers();
 		selNodes = new node[selSize];
@@ -57,7 +77,7 @@ public class sweep {
 		alpha = 2 * aPop.getPopSize() * selCoeff;
 		
 		for( int inode = 0; inode<aPop.getMembers().getNumMembers();inode++){
-			if(!dorandom || CoalescentMain.random.randomDouble() < finalSelFreq){
+			if(!dorandom || random.randomDouble() < finalSelFreq){
 				selNodes[nsel] = aPop.getMembers().getNode(inode);
 				nsel++;
 			}
@@ -71,7 +91,7 @@ public class sweep {
 		rate = swGetPoissonRate(popName);
 		poissonEventTime = 1e50;
 		if(rate>0){
-			poissonEventTime = poisson.poissonGetNext(rate);
+			poissonEventTime = poissoner.poissonGetNext(rate);
 			
 		}
 		tNonsweep = gen + poissonEventTime;
@@ -80,28 +100,28 @@ public class sweep {
 			while(t>tNonsweep){
 			    /* Process event in a nonsweep population, and update time for next nonsweep event */
 				swDoPoisson(popName,tNonsweep);
-				poissonEventTime = poisson.poissonGetNext(swGetPoissonRate(popName));
+				poissonEventTime = poissoner.poissonGetNext(swGetPoissonRate(popName));
 				tNonsweep += poissonEventTime;
 			}
 			selFreq = epsilon / (epsilon + (1-epsilon)* Math.exp(selCoeff * (t + endShift - tEnd)));
 			probCoalSel = deltaT * nsel * (nsel -1) /4 / aPop.getPopSize() / selFreq;
 			probCoalUnsel = deltaT * nunsel * (nunsel -1) / 4 / aPop.getPopSize() / (1-selFreq);
-			probRecomb = deltaT * (nsel + nunsel) * CoalescentMain.recomb.recombGetR();
-			probGc = deltaT * (nsel + nunsel) * CoalescentMain.geneConversion.getR();
+			probRecomb = deltaT * (nsel + nunsel) * recomb.recombGetR();
+			probGc = deltaT * (nsel + nunsel) * geneConversion.getR();
 			allProb = 0;
 			allProb += probCoalUnsel + probCoalSel + probRecomb + probGc;
 			
-			x = CoalescentMain.random.randomDouble();
+			x = random.randomDouble();
 			
 			if(allProb >= x ){
 				if(x < probRecomb/allProb){
 				//Recombination. Pic sel/unsel for new chrom piece	
 				
-					int selPopIndex = CoalescentMain.dem.getPopIndexByName(popName);
-					recNodes = CoalescentMain.recomb.recombExecute(t, selPopIndex, loc);
+					int selPopIndex = dem.getPopIndexByName(popName);
+					recNodes = recomb.recombExecute(t, selPopIndex, loc);
 					if(recNodes != null){
 						//which segment carries old allele?
-						if(loc < selPos){
+						if(loc.getDouble() < selPos){
 							oldAlleleNode = recNodes[2];
 							newAlleleNode = recNodes[1];
 							
@@ -131,7 +151,7 @@ public class sweep {
 						if(!foundIt)System.out.println(String.format("Could not find %d\n", recNodes[0].getName()));
 						assert(foundIt);
 				/* Decide whether the chrom that we've recombined onto is selected or unselected */
-						if(CoalescentMain.random.randomDouble() < selFreq){
+						if(random.randomDouble() < selFreq){
 							if(nsel ==selSize){
 							selSize *=2;// new sized node array of this size 
 							node[] tempArr = new node [selSize];
@@ -175,11 +195,11 @@ public class sweep {
 				}
 				else{
 					//gene conversion pick sel/unsel for new chrom piece
-					int selPopIndex = CoalescentMain.dem.getPopIndexByName(popName);
-					gcNodes = CoalescentMain.geneConversion.execute(t, selPopIndex, loc1, loc2);
+					int selPopIndex = dem.getPopIndexByName(popName);
+					gcNodes = geneConversion.execute(t, selPopIndex, loc1, loc2);
 					if(gcNodes != null){
 						//which segment carries old allele?
-						if(loc1<= selPos && loc2>=selPos){
+						if(loc1.getDouble()<= selPos && loc2.getDouble()>=selPos){
 							oldAlleleNode = gcNodes[1];
 							newAlleleNode = gcNodes[2];
 						}
@@ -210,7 +230,7 @@ public class sweep {
 						
 						
 						/* Decide whether the chrom that we've recombined onto is selected or unselected */
-						if(CoalescentMain.random.randomDouble() < selFreq){
+						if(random.randomDouble() < selFreq){
 							if(nsel == selSize){
 								selSize *=2;// new sized node array of this size 
 								node[] tempArr = new node [selSize];
@@ -247,7 +267,7 @@ public class sweep {
 			}
 			
 		}
-		aMut = new mutations();
+		aMut = new mutations(dem);
 		aMut.setLocation(selPos);
 		aMut.setMutNodes(null);
 		aMut.setAncNode1(null);
@@ -266,18 +286,18 @@ public class sweep {
 		int node1Index,node2Index,inode,nodesAtLoc;
 		boolean contains;
 		node aNode1,aNode2,newNode;
-		siteList siteTemp = CoalescentMain.dem.getRecombSites();
+		siteList siteTemp = dem.getRecombSites();
 		double loc;
 		seg tSeg;
 		//step 1
-		node1Index = (int)(CoalescentMain.random.randomDouble() * nnode);
-		node2Index = (int)(CoalescentMain.random.randomDouble() * (nnode -1));
+		node1Index = (int)(random.randomDouble() * nnode);
+		node2Index = (int)(random.randomDouble() * (nnode -1));
 		if(node2Index >= node1Index)node2Index ++;
 		aNode1 = nodes[node1Index];
 		aNode2 = nodes[node2Index];
 		
 		//step 2
-		newNode = CoalescentMain.nodeFactory.nodeCoalesce(aNode1, aNode2, t);
+		newNode = nodeFactory.nodeCoalesce(aNode1, aNode2, t);
 		//step 2a
 		while(siteTemp.getNext() != null){
 			loc = (siteTemp.getSite()+siteTemp.getNext().getSite())/2;
@@ -326,22 +346,22 @@ public class sweep {
 		nnode ++;
 		
 		//step 5
-		CoalescentMain.dem.dgLog(2, t, aNode1,aNode2,newNode,aPop);
+		dem.dgLog(2, t, aNode1,aNode2,newNode,aPop);
 		return nnode;
 	}
 	/* coalesce_get_rate, modified to ignore coalescence in target pop */
 
 	public double swCoalesceGetRate(int selPopName){
-		int numPops = CoalescentMain.dem.getNumPops();
+		int numPops = dem.getNumPops();
 		int i;
 		double rate = 0;
 		int numNodes;
 		int popSize;
 		for (i=0;i<numPops;i++){
-			int thisPop = CoalescentMain.dem.getPopNameByIndex(i);
+			int thisPop = dem.getPopNameByIndex(i);
 			if(thisPop == selPopName){continue;}
-			numNodes = CoalescentMain.dem.getNumNodesInPopByIndex(i);
-			popSize = CoalescentMain.dem.getPopSizeByIndex(i);
+			numNodes = dem.getNumNodesInPopByIndex(i);
+			popSize = dem.getPopSizeByIndex(i);
 			if(numNodes > 1){
 				rate += (double) (numNodes * (numNodes -1))/4*popSize;
 			}
@@ -349,29 +369,29 @@ public class sweep {
 		return rate;
 	}
 	public double swRecombGetRate(int selPopName){
-		int numPops = CoalescentMain.dem.getNumPops();
+		int numPops = dem.getNumPops();
 		int i;
 		double rate = 0;
-		double r = CoalescentMain.recomb.recombGetR();
+		double r = recomb.recombGetR();
 		int numNodes;
 		for(i = 0;i<numPops;i++){
-			int thisPop = CoalescentMain.dem.getPopNameByIndex(i);
+			int thisPop = dem.getPopNameByIndex(i);
 			if(thisPop == selPopName){continue;}
-			numNodes = CoalescentMain.dem.getNumNodesInPopByIndex(i);
+			numNodes = dem.getNumNodesInPopByIndex(i);
 			rate += (numNodes * r);
 		}
 		return rate;
 		
 	}
 	public double swGCGetRate(int selPopName){
-		int numPops = CoalescentMain.dem.getNumPops();
+		int numPops = dem.getNumPops();
 		int i;
-		double rate = 0,r=CoalescentMain.geneConversion.getR();
+		double rate = 0,r=geneConversion.getR();
 		int numNodes;
 		for(i=0;i<numPops;i++){
-			int thisPop = CoalescentMain.dem.getPopNameByIndex(i);
+			int thisPop = dem.getPopNameByIndex(i);
 			if(thisPop == selPopName){continue;}
-			numNodes = CoalescentMain.dem.getNumNodesInPopByIndex(i);
+			numNodes = dem.getNumNodesInPopByIndex(i);
 			rate += (numNodes*r);
 			
 		}
@@ -380,26 +400,26 @@ public class sweep {
 	public int swCoalescePickPopIndex(int selPopName){
 		double randCounter,sumProb,totProb;
 		int popIndex = -1,
-		numPops = CoalescentMain.dem.getNumPops(),
+		numPops = dem.getNumPops(),
 		numNodes,popSize,i,thisPop;
 		
 		totProb = 0;
 		for(i=0;i<numPops;i++){
-			thisPop = CoalescentMain.dem.getPopNameByIndex(i);
+			thisPop = dem.getPopNameByIndex(i);
 			if(thisPop == selPopName){continue;}
-			numNodes = CoalescentMain.dem.getNumNodesInPopByIndex(i);
-			popSize = CoalescentMain.dem.getPopSizeByIndex(i);
+			numNodes = dem.getNumNodesInPopByIndex(i);
+			popSize = dem.getPopSizeByIndex(i);
 			totProb += (double)(numNodes * (numNodes =1))/(4*popSize);
 			
 		}
-		randCounter = CoalescentMain.random.randomDouble() * totProb;
+		randCounter = random.randomDouble() * totProb;
 		
 		sumProb = 0;
 		for(i = 0;i<numPops;i++){
-			thisPop = CoalescentMain.dem.getPopNameByIndex(i);
+			thisPop = dem.getPopNameByIndex(i);
 			if(thisPop == selPopName){continue;}
-			numNodes = CoalescentMain.dem.getNumNodesInPopByIndex(i);
-			popSize = CoalescentMain.dem.getPopSizeByIndex(i);
+			numNodes = dem.getNumNodesInPopByIndex(i);
+			popSize = dem.getPopSizeByIndex(i);
 			sumProb += (double)(numNodes * (numNodes-1))/(4*popSize);
 			if(randCounter <= sumProb){
 				popIndex = i;
@@ -411,23 +431,23 @@ public class sweep {
 	}
 	
 	public int swRecombPickPopIndex(int selPopName){
-		int popIndex=-1,i,sumNodes=0,totNodes,numPops = CoalescentMain.dem.getNumPops();
+		int popIndex=-1,i,sumNodes=0,totNodes,numPops = dem.getNumPops();
 		double randCounter;
 		
 		totNodes = 0;
 		for (i = 0;i<numPops;i++){
-			int thisPop = CoalescentMain.dem.getPopNameByIndex(i);
+			int thisPop = dem.getPopNameByIndex(i);
 			if(thisPop == selPopName){continue;}
-			totNodes += CoalescentMain.dem.getNumNodesInPopByIndex(i);
+			totNodes += dem.getNumNodesInPopByIndex(i);
 		}
-		randCounter = totNodes * CoalescentMain.random.randomDouble();
+		randCounter = totNodes * random.randomDouble();
 		assert(randCounter <= totNodes);
 		
 		//weight pops by numNodes
 		for(i=0;i<numPops;i++){
-			int thisPop = CoalescentMain.dem.getPopNameByIndex(i);
+			int thisPop = dem.getPopNameByIndex(i);
 			if(thisPop == selPopName){continue;}
-			sumNodes += CoalescentMain.dem.getNumNodesInPopByIndex(i);
+			sumNodes += dem.getNumNodesInPopByIndex(i);
 			if(randCounter <= sumNodes){
 				popIndex = i;
 				break;
@@ -443,12 +463,14 @@ public class sweep {
 		return poissonRate;
 	}
 	public void swDoPoisson(int selPopName,double gen){
-		double randDouble = CoalescentMain.random.randomDouble();
-		double dum = 0,dum2 = 0;
+		double randDouble = random.randomDouble();
+		doublePointer dum,dum2;
+		dum = new doublePointer();
+		dum2 = new doublePointer();
 		int recombPop;
 		if(randDouble<(recombRate/poissonRate)){
 			recombPop = swRecombPickPopIndex(selPopName);
-			CoalescentMain.recomb.recombExecute(gen,recombPop, dum);
+			recomb.recombExecute(gen,recombPop, dum);
 			
 		}
 		else if(randDouble < (recombRate + migrateRate)/poissonRate){
@@ -456,11 +478,11 @@ public class sweep {
 		}
 		else if (randDouble <(recombRate + migrateRate + coalesceRate)/poissonRate){
 			int popIndex = this.swCoalescePickPopIndex(selPopName);
-			CoalescentMain.dem.coalesceByIndex(popIndex, gen);
+			dem.coalesceByIndex(popIndex, gen);
 		}
 		else{
 			int popIndex = this.swRecombPickPopIndex(selPopName);
-			CoalescentMain.geneConversion.execute(gen, popIndex, dum2, dum2);
+			geneConversion.execute(gen, popIndex, dum2, dum2);
 		}
 		return;
 	}

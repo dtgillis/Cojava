@@ -1,5 +1,8 @@
 package files;
 
+import geneConversion.gc;
+import historical.histWorker;
+
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -7,20 +10,34 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.regex.Pattern;
 
+import cosiRand.randomNum;
+
 import recomb.recListMaker;
 import simulator.sim;
 
 import coalescent.ArgHandler;
 import coalescent.CoalescentMain;
+import demography.demography;
 public class fileReader {
 	ArgHandler fileSet;
 	String[] args;
 	boolean seeded = false;
 	private boolean debug = true;
 	int length;
-	public fileReader(ArgHandler aFileSet ){
+	demography dem;
+	recListMaker recomb;
+	sim simulator;
+	gc geneConversion;
+	histWorker histFactory;
+	randomNum random;
+	public fileReader(ArgHandler aFileSet,demography adem,recListMaker aRecomb,sim aSim,gc aGeneConverter ,histWorker aHistFactory,randomNum aRNG  ){
+		histFactory = aHistFactory;
+		simulator = aSim;
+		dem = adem;
 		fileSet = aFileSet;
-		
+		recomb = aRecomb;
+		geneConversion = aGeneConverter;
+		random = aRNG;
 	}
 	public void paramFileProcess(){
 		try {
@@ -48,7 +65,7 @@ public class fileReader {
 			}
 		stream.close();
 		if(!seeded){
-			System.out.println(String.format("coalescent seed: %d\n", -1 * CoalescentMain.random.seedRNG()));
+			System.out.println(String.format("coalescent seed: %d\n", -1 * random.seedRNG()));
 		}
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
@@ -60,7 +77,7 @@ public class fileReader {
 		if(line.contains("length")){//length has to be set before recomb file
 			System.out.println(line);
 			length = Integer.parseInt(cleanString(line)[1]);
-			CoalescentMain.simulator.simSetLength(length);
+			simulator.simSetLength(length);
 		}
 		else if (line.contains("recomb_file")){
 			System.out.println(line);
@@ -70,7 +87,7 @@ public class fileReader {
 			System.out.println(line);
 			args = cleanString(line);
 			double mu =  Double.parseDouble(args[1]);
-			CoalescentMain.simulator.setTheta(mu*length);
+			simulator.setTheta(mu*length);
 			// set mutation rate in sim
 		}
 		else if (line.contains("infinite_sites")){
@@ -85,13 +102,13 @@ public class fileReader {
 			System.out.println(line);
 			args = cleanString(line);
 			double gcr = Double.parseDouble(args[1]);
-			CoalescentMain.geneConversion.setGCRate(gcr);
+			geneConversion.setGCRate(gcr);
 		}
 		else if (line.contains("number_mutation_sites")){
 			System.out.println(line);
 			args = cleanString(line);
 			int numMut = Integer.parseInt(args[1]);
-			CoalescentMain.simulator.setNumMut(numMut);
+			simulator.setNumMut(numMut);
 			
 		}
 		else if (line.contains("pop_label")){
@@ -103,7 +120,7 @@ public class fileReader {
 			args = cleanString(line);
 			int popName = Integer.parseInt(args[1]);
 			int popSize = Integer.parseInt(args[2]);
-			if(CoalescentMain.dem.setPopSizeByName(0, popName, popSize)!=1)
+			if(dem.setPopSizeByName(0, popName, popSize)!=1)
 			System.out.println("parameter file pop Specified does not exist ERROR" + line);
 		}
 		else if (line.contains("sample_size")){
@@ -111,7 +128,7 @@ public class fileReader {
 			args = cleanString(line);
 			int popName = Integer.parseInt(args[1]);
 			int sampleSize = Integer.parseInt(args[2]);
-			CoalescentMain.dem.populateByName(popName, sampleSize, 0);
+			dem.populateByName(popName, sampleSize, 0);
 			if(fileSet.getSegFile()!= null){
 				String out = String.format("A %d %d\n", popName,sampleSize);
 				//write out to file
@@ -123,11 +140,11 @@ public class fileReader {
 			int popName = Integer.parseInt(args[1]);
 			char[] label = args[2].toCharArray();
 			//String 
-			CoalescentMain.dem.createPop(popName, label, 0);
+			dem.createPop(popName, label, 0);
 		}
 		else if (line.contains("pop_event")){
 			System.out.println(line);
-			CoalescentMain.histFactory.historicalProcessPopEvent(line);
+			histFactory.historicalProcessPopEvent(line);
 			
 		}
 		else if (line.contains("random_seed")){
@@ -135,7 +152,7 @@ public class fileReader {
 			args = cleanString(line);
 			if(Double.parseDouble(args[1])>0){
 				long rseed = -1*Long.parseLong(args[1]);
-				CoalescentMain.random.setRngSeed(rseed);
+				random.setRngSeed(rseed);
 				
 			}
 		}
@@ -157,10 +174,10 @@ public class fileReader {
 				String[] result = line.split("\\s+");
 				int start = Integer.parseInt(result[0]);
 				double rate = Double.parseDouble(result[1]);
-				CoalescentMain.recomb.addRecombSiteLL(start, rate);
+				recomb.addRecombSiteLL(start, rate);
 			}
 		aStream.close();
-		CoalescentMain.recomb.recomb_calc_r();
+		recomb.recomb_calc_r();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}

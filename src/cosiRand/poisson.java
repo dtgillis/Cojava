@@ -1,12 +1,10 @@
 package cosiRand;
 
-import java.security.SecureRandom;
-import java.util.Random;
-
-import coalescent.CoalescentMain;
-
 public class poisson {
-	 Random generator = new Random();
+	randomNum random;
+	public poisson(randomNum aRNG){
+		 random = aRNG;
+	}
 	public  int poission(double xm){
 		double em,t,y,sq = 0,alxm = 0,g = 0,oldm;
 		oldm = -1.0;
@@ -19,7 +17,7 @@ public class poisson {
 			t = 1.0;
 			do{
 				em += 1.0;
-				t *= generator.nextDouble();
+				t *= random.randomDouble();
 			}while(t>g);
 		}
 		else{
@@ -31,13 +29,13 @@ public class poisson {
 			}
 			do{
 				do{
-					y = Math.tan(Math.PI * generator.nextDouble());
+					y = Math.tan(Math.PI * random.randomDouble());
 					em = sq*y + xm;
 					
 				}while(em < 0);
 				em = Math.floor(em);
 				t = .9 * (1.0 + y*y)* Math.exp(em*alxm - gammaLn.gammLn(em + 1.0)-g);
-			}while (generator.nextDouble() > t);
+			}while (random.randomDouble() > t);
 		}
 		return (int) (em+.5);
 		
@@ -45,7 +43,6 @@ public class poisson {
 	public  double poissonGetNext(double rate){
 		double ed;
 		if(rate ==0) return -1;
-		//ed = expDev();
 		ed = expDev();
 		return (ed/rate);
 		
@@ -53,7 +50,7 @@ public class poisson {
 	private  double expDev(){
 		double dum = 0;
 			//SecureRandom generator = new SecureRandom();
-		double rand = 	CoalescentMain.random.randomDouble();
+		double rand = 	random.randomDouble();
 		dum = (double) 1 - rand;
 		
 		double returner = - Math.log(dum);

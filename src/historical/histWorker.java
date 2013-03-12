@@ -3,7 +3,14 @@ package historical;
 import java.util.ArrayList;
 import java.util.StringTokenizer;
 
+import bottleNeck.bottleNeck;
+
+import sweep.sweep;
+
+import migration.migrationWorker;
+
 import coalescent.CoalescentMain;
+import demography.demography;
 
 public class histWorker {
 	///constants for history 
@@ -32,8 +39,16 @@ public class histWorker {
 		historicalEvent currentEvent;
 		final int EXP_INT = 10;
 		final boolean DEBUG = true;
-		public histWorker(){
+		demography dem;
+		migrationWorker migFactory;
+		sweep sweeper;
+		bottleNeck bottleneck;
+		public histWorker(demography adem,migrationWorker aMigFactory,sweep aSweeper,bottleNeck aBottleNeck ){
+			migFactory = aMigFactory;
+			dem = adem;
 			currentEvent = null;
+			sweeper = aSweeper;
+			bottleneck = aBottleNeck;
 		}
 	public int historicalNumPops (int type ){
 		switch (type) {
@@ -119,32 +134,32 @@ public class histWorker {
 			return 0;
 		}
 		else{
-			CoalescentMain.dem.dgLog(10 , currentEvent.getGen(), currentEvent.getLabel());
+			dem.dgLog(10 , currentEvent.getGen(), currentEvent.getLabel());
 			switch(currentEvent.getType()){
 			case HE_POP_SIZE:
-				CoalescentMain.dem.setPopSizeByName(currentEvent.getGen(), currentEvent.getPopIndex()[0], (int) currentEvent.getParams()[0]);
+				dem.setPopSizeByName(currentEvent.getGen(), currentEvent.getPopIndex()[0], (int) currentEvent.getParams()[0]);
 				break;
 			
 			case HE_POP_SIZE_EXP:
-				CoalescentMain.dem.setPopSizeByName(currentEvent.getGen(), currentEvent.getPopIndex()[0], (int) (currentEvent.getParams()[1]+.5));
+				dem.setPopSizeByName(currentEvent.getGen(), currentEvent.getPopIndex()[0], (int) (currentEvent.getParams()[1]+.5));
 				historicalNextExp(currentEvent);
 				break;
 			case HE_BOTTLENECK:
-				bottleNeck.bottleNeck.bottleNeckExecute(currentEvent.getPopIndex()[0],currentEvent.getParams()[0], (int) currentEvent.getGen());
+				bottleneck.bottleNeckExecute(currentEvent.getPopIndex()[0],currentEvent.getParams()[0], (int) currentEvent.getGen());
 				break;
 			case HE_ADMIX:
-				CoalescentMain.dem.moveNodesByName(currentEvent.getPopIndex()[0], currentEvent.getPopIndex()[1], currentEvent.getParams()[0], currentEvent.getGen());
+				dem.moveNodesByName(currentEvent.getPopIndex()[0], currentEvent.getPopIndex()[1], currentEvent.getParams()[0], currentEvent.getGen());
 				break;
 			case HE_MIGRATION:
-				CoalescentMain.migFactory.migrateDelete(currentEvent.getPopIndex()[1], currentEvent.getPopIndex()[0]);
-				CoalescentMain.migFactory.migrateAdd(currentEvent.getPopIndex()[1],currentEvent.getPopIndex()[0], currentEvent.getParams()[0]);
+				migFactory.migrateDelete(currentEvent.getPopIndex()[1], currentEvent.getPopIndex()[0]);
+				migFactory.migrateAdd(currentEvent.getPopIndex()[1],currentEvent.getPopIndex()[0], currentEvent.getParams()[0]);
 				break;
 			case HE_SPLIT:
-				CoalescentMain.dem.moveNodesByName(currentEvent.getPopIndex()[1], currentEvent.getPopIndex()[0], 1, currentEvent.getGen());
-				CoalescentMain.dem.endPopByName(currentEvent.getPopIndex()[1]);
+				dem.moveNodesByName(currentEvent.getPopIndex()[1], currentEvent.getPopIndex()[0], 1, currentEvent.getGen());
+				dem.endPopByName(currentEvent.getPopIndex()[1]);
 				break;
 			case HE_SWEEP:
-				gen = CoalescentMain.sweeper.sweepExecute(currentEvent.getPopIndex()[0], currentEvent.getParams()[0], currentEvent.getGen(), currentEvent.getParams()[1], currentEvent.getParams()[2]);
+				gen = sweeper.sweepExecute(currentEvent.getPopIndex()[0], currentEvent.getParams()[0], currentEvent.getGen(), currentEvent.getParams()[1], currentEvent.getParams()[2]);
 				break;
 		}
 			tempEvent = currentEvent;

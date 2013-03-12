@@ -7,6 +7,7 @@ import java.io.File;
 import segment.segWorker;
 
 import coalescent.CoalescentMain;
+import demography.demography;
 import nodes.node;
 
 public class mutations {
@@ -14,8 +15,9 @@ public class mutations {
 	node ancNode1,ancNode2;
 	mutNodeList mutNodes;
 	boolean MUTATE_DEBUG = true;
-	public mutations(){
-		
+	demography dem;
+	public mutations(demography adem){
+		dem = adem;
 	}
 	public void setLocation(double aLoc){
 		location = aLoc;
@@ -45,7 +47,7 @@ public class mutations {
 	public void mutateFindAndPrint(File aFile,int regionNum,double loc,double randMark,double treeTime,mutList aMutList,hap aHap){
 		mutations aMut;
 		node aNode;
-		aNode = CoalescentMain.dem.getHeadNode(regionNum);
+		aNode = dem.getHeadNode(regionNum);
 		aMut = mutateRegion(aNode,loc,treeTime,randMark);
 		if(MUTATE_DEBUG){
 			System.out.println("mark: " + randMark);
@@ -66,7 +68,7 @@ public class mutations {
 		mutations newMuts;
 		node mutateNode,tempNode;
 		tempNode = headNode;
-		newMuts = new mutations();
+		newMuts = new mutations(dem);
 		newMuts.setLocation(loc);
 		mutateNode = mutateRecurse(tempNode,ratio,newMuts,treeAge,randMark,loc);
 		newMuts.setMutNodes(mutateDescendents(mutateNode,null,loc));

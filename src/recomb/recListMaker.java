@@ -1,12 +1,10 @@
 package recomb;
 
-import java.util.ArrayList;
-
-import pointers.doublePointer;
 
 import nodes.node;
-
-import coalescent.CoalescentMain;
+import pointers.doublePointer;
+import cosiRand.randomNum;
+import demography.demography;
 
 public class recListMaker {
 	
@@ -22,13 +20,16 @@ public class recListMaker {
 			next = aNext;
 		}
 	}
+	demography dem;
 	int length,count;
 	double recombRate,lastRate;
 	recombStructure recombs;
+	randomNum random;
 	//ArrayList<recombStructure> recList;
 	
-	public recListMaker(){
-	    
+	public recListMaker(demography adem, randomNum aRNG){
+		random = aRNG;
+	    dem = adem;
 	}
 	public void setLength(int i){
 		length = i;
@@ -92,7 +93,7 @@ public class recListMaker {
 		double rr = 0 ;
 		double end;
 		
-		temp1 = CoalescentMain.random.randomDouble();
+		temp1 = random.randomDouble();
 		temp = (double) (temp1 * (recombRate));
 		
 		while (tempRecomb != null && tempRecomb.startBase < length && rr < temp){
@@ -113,16 +114,16 @@ public class recListMaker {
 		
 		loc = (double) ((int) (end - (rr - temp)/ tempRecomb.rate)) / length;
 		location.setDouble(loc); // pointer magic ?
-		return CoalescentMain.dem.recombineByIndex(popIndex, gen, loc);
+		return dem.recombineByIndex(popIndex, gen, loc);
 	}
 	public double recombGetRate(){
-		int numPops = CoalescentMain.dem.getNumPops();
+		int numPops = dem.getNumPops();
 		int i;
 		double rate = 0;
 		int numNodes;
 		if(recombRate == 0) return 0;
 		for(i=0;i<numPops;i++){
-			numNodes = CoalescentMain.dem.getNumNodesInPopByIndex(i);
+			numNodes = dem.getNumNodesInPopByIndex(i);
 			rate += (numNodes* recombRate);
 		}
 		lastRate = rate;
@@ -134,14 +135,14 @@ public class recListMaker {
 		     It assumes that get_rate has been called immediately before this 
 		     function, with no change in the number of chromosomes since. sfs */
 		int popIndex =0,i,numNodes;
-		double randCounter = CoalescentMain.random.randomDouble() * lastRate;
+		double randCounter = random.randomDouble() * lastRate;
 		double rate = 0;
-		int numPops = CoalescentMain.dem.getNumPops();
+		int numPops = dem.getNumPops();
 		
 		//weigh pops by numNodes
 		if(numPops>1){
 			for(i=0;i<numPops && rate<randCounter; i++){
-				numNodes = CoalescentMain.dem.getNumNodesInPopByIndex(i);
+				numNodes = dem.getNumNodesInPopByIndex(i);
 				rate+=(numNodes*recombRate);
 			}
 			popIndex = i -1;
