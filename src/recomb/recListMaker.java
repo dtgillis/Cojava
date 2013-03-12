@@ -2,6 +2,8 @@ package recomb;
 
 import java.util.ArrayList;
 
+import pointers.doublePointer;
+
 import nodes.node;
 
 import coalescent.CoalescentMain;
@@ -37,17 +39,17 @@ public class recListMaker {
 	
 	public void addRecombSiteLL(int aStart,double aRate){
 		recombStructure  newRecomb = new recombStructure(aStart,aRate,0.0,null);
+		recombStructure tempRecomb = recombs;
 		if(recombs == null){
 			recombs = newRecomb;
+			return;
 		}
 		else if (recombs.startBase>aStart){
 			newRecomb.next = recombs;
 			recombs = newRecomb;
+			return;			
 		}
 		else{
-		recombStructure tempRecomb = recombs; 
-				//new recombStructure(recombs.startBase,recombs.rate,
-		//recombs.cumulative,recombs.next);
 		while (tempRecomb.next !=null){
 			if(tempRecomb.next.startBase > aStart){
 				newRecomb.next = tempRecomb.next;
@@ -83,14 +85,14 @@ public class recListMaker {
 	public double recombGetR(){
 		return recombRate;
 	}
-	public node[] recombExecute(double gen,int popIndex, Double location){
+	public node[] recombExecute(double gen,int popIndex, doublePointer location){
 		double loc;
 		double temp,temp1;
 		recombStructure tempRecomb = recombs;
 		double rr = 0 ;
 		double end;
 		
-		temp1 = cosiRand.randomNum.randomDouble();
+		temp1 = CoalescentMain.random.randomDouble();
 		temp = (double) (temp1 * (recombRate));
 		
 		while (tempRecomb != null && tempRecomb.startBase < length && rr < temp){
@@ -110,7 +112,7 @@ public class recListMaker {
 		else end = tempRecomb.next.startBase;
 		
 		loc = (double) ((int) (end - (rr - temp)/ tempRecomb.rate)) / length;
-		location = loc; // pointer magic ?
+		location.setDouble(loc); // pointer magic ?
 		return CoalescentMain.dem.recombineByIndex(popIndex, gen, loc);
 	}
 	public double recombGetRate(){
@@ -132,7 +134,7 @@ public class recListMaker {
 		     It assumes that get_rate has been called immediately before this 
 		     function, with no change in the number of chromosomes since. sfs */
 		int popIndex =0,i,numNodes;
-		double randCounter = cosiRand.randomNum.randomDouble() * lastRate;
+		double randCounter = CoalescentMain.random.randomDouble() * lastRate;
 		double rate = 0;
 		int numPops = CoalescentMain.dem.getNumPops();
 		
