@@ -33,7 +33,7 @@ public class coalesce {
 	}
 	public int coalescePickPopIndex(){
 		double rate = 0;
-		double randCounter = cosiRand.randomNum.randomDouble();
+		double randCounter = CoalescentMain.random.randomDouble();
 		int i,popIndex,numPops,numNodes,popSize;
 		popIndex = 0;
 		numPops = CoalescentMain.dem.getNumPops();
