@@ -5,45 +5,51 @@ public class segWorker {
 	public segWorker(){
 		
 	}
-	public seg segInverse(seg aSegment){
-		seg newSeg , newSeg2;
-		seg oldSeg, headSeg;
-		boolean setend = true;
-		if(aSegment == null){
-			return new seg(0,1);
-		}
-		
-		headSeg = new seg(0,0);
-		newSeg = headSeg;
-		
-		oldSeg = aSegment;
-		
-		if(oldSeg.begin > 0)
-			newSeg.begin = 0;
-		else{
-			newSeg.end = oldSeg.begin;
-			oldSeg = oldSeg.next;
-		}
-		while (oldSeg != null){
-			newSeg.end = oldSeg.begin;
-			if(oldSeg.end != 1){
-				newSeg2 = new seg(0,0);
-				newSeg.next = newSeg2;
-				newSeg = newSeg2;
-				newSeg.begin = oldSeg.end;
-				oldSeg = oldSeg.next;
-			}
-			else{
-				setend = false;
-				oldSeg = oldSeg.next;
-			}
-		}
-			if(setend)
-				newSeg.end=1;
-			
-			newSeg.next = null;
-			return headSeg;
-		}
+	public seg segInverse (seg segptr) 
+	{
+	  seg newseg, newseg2;
+	  seg oldseg, headseg;
+	  boolean setend = true;
+
+	  if (segptr == null) 
+	    return new seg(0,1);
+
+	  headseg = new seg(0,0);
+	  
+	  newseg = headseg;
+
+	  oldseg = segptr;
+
+	  if (oldseg.begin > 0)
+	    newseg.begin = 0;
+	  else {
+	    newseg.begin = oldseg.end;
+	    oldseg = oldseg.next;
+	  }
+
+	  while (oldseg != null) {
+	    newseg.end = oldseg.begin;
+	    if (oldseg.end != 1) {
+				
+	      newseg2 = new seg(0,0);
+	      newseg.next = newseg2;
+	      newseg = newseg2;
+	      newseg.begin = oldseg.end;
+	      oldseg = oldseg.next;
+	    }
+	    else {
+	      setend = false;
+	      oldseg = oldseg.next;
+	    }
+	  }
+	       
+	  if(setend)
+	    newseg.end = 1;
+
+
+	  newseg.next = null;
+	  return headseg;
+	}
 	public seg segUnion(seg seg1, seg seg2){
 		double begin,end;
 		seg activeSeg,nextSeg,tempSeg,newSeg;
