@@ -2,11 +2,14 @@ package cosiRand;
 
 public class poisson {
 	randomNum random;
+	double sq,alxm,g,oldm=-1;
+	
+	
 	public poisson(randomNum aRNG){
 		 random = aRNG;
 	}
 	public  int poission(double xm){
-		double em,t,y,sq = 0,alxm = 0,g = 0,oldm;
+		double em,t,y;
 		oldm = -1.0;
 		if(xm<12.0){
 			if(xm!=oldm){
@@ -41,9 +44,9 @@ public class poisson {
 		
 	}
 	public  double poissonGetNext(double rate){
-		double ed;
+		 
 		if(rate ==0) return -1;
-		ed = expDev();
+		double ed = expDev();
 		return (ed/rate);
 		
 	}
