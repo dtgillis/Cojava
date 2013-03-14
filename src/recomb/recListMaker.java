@@ -10,14 +10,20 @@ public class recListMaker {
 	
 	private class recombStructure{
 		int startBase;
-		double rate,cumulative;
+		double rate;
+		private double cumulative;
 		recombStructure next;
 		public recombStructure(int aStartBase,double aRate,
 				double aCumulative,recombStructure aNext){
 			startBase = aStartBase;
 			rate = aRate;
-			cumulative = aCumulative;
 			next = aNext;
+		}
+		public double getCumulative() {
+			return cumulative;
+		}
+		public void setCumulative(double cumulative) {
+			this.cumulative = cumulative;
 		}
 	}
 	demography dem;
@@ -78,9 +84,10 @@ public class recListMaker {
 			else
 				rr += (tempRecomb.next.startBase - tempRecomb.startBase) * tempRecomb.rate;
 			
-			tempRecomb.cumulative = rr;
+			tempRecomb.setCumulative(rr);
 			tempRecomb = tempRecomb.next;
 		}
+		
 		recombRate = rr;
 	}
 	public double recombGetR(){
