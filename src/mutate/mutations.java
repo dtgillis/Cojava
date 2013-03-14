@@ -2,11 +2,15 @@ package mutate;
 
 import haplos.hap;
 
+import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+
+import pointers.doublePointer;
 
 import segment.segWorker;
 
-import coalescent.CoalescentMain;
 import demography.demography;
 import nodes.node;
 
@@ -16,7 +20,9 @@ public class mutations {
 	mutNodeList mutNodes;
 	boolean MUTATE_DEBUG = true;
 	demography dem;
-	public mutations(demography adem){
+	segWorker segFactory;
+	public mutations(demography adem,segWorker aSegWorker){
+		segFactory = aSegWorker;
 		dem = adem;
 	}
 	public void setLocation(double aLoc){
@@ -64,11 +70,11 @@ public class mutations {
 	// internal functions
 	
 	mutations mutateRegion(node headNode,double loc,double treeAge,double randMark){
-		double ratio = 0;
+		doublePointer ratio = new doublePointer();//already set to 0...
 		mutations newMuts;
 		node mutateNode,tempNode;
 		tempNode = headNode;
-		newMuts = new mutations(dem);
+		newMuts = new mutations(dem,segFactory);
 		newMuts.setLocation(loc);
 		mutateNode = mutateRecurse(tempNode,ratio,newMuts,treeAge,randMark,loc);
 		newMuts.setMutNodes(mutateDescendents(mutateNode,null,loc));
@@ -90,35 +96,56 @@ public class mutations {
 	 *    If so, put the mutation there. If not, recurse on this
 	 *    descendent.
 	 */
-	node mutateRecurse(node aNode,double ratio,mutations newMuts,double treeAge,double threshold,double loc){
-		node mutateNode = null;
-		segWorker segFactory = new segWorker();
-		if(aNode.getDescendents()[1]!= null){
-			if(segFactory.segContains(aNode.getDescendents()[1].getSegment(), loc)){
-				ratio += (double)(aNode.getGen() - aNode.getDescendents()[1].getGen())/treeAge;
-				if(ratio > threshold){
-					newMuts.setAncNode1(aNode);
-					newMuts.setAncNode2(aNode.getDescendents()[1]);
-					return aNode.getDescendents()[1];
-				}
-				mutateNode = mutateRecurse(aNode.getDescendents()[1],ratio,newMuts,treeAge,threshold,loc);
-				if(mutateNode != null) return mutateNode;
-				//this happens if we place a mutation inside this recursion
-			}
-		}
-		else return null;
-		if((aNode.getDescendents()[0]!= null)&& (segFactory.segContains(aNode.getDescendents()[0].getSegment(), loc))){
-			ratio += (double)(aNode.getGen() - aNode.getDescendents()[1].getGen())/treeAge;
-			if(ratio>threshold){
-				newMuts.setAncNode1(aNode);
-				newMuts.setAncNode2(aNode.getDescendents()[0]);
-				return aNode.getDescendents()[0];
-			}
-			mutateNode = mutateRecurse(aNode.getDescendents()[0],ratio,newMuts,treeAge,threshold,loc);
-			if(mutateNode!=null)return mutateNode;
-			//this happens if we place a mutation inside this recursion
-		}
-		return null;
+	node mutateRecurse(node  nodeptr, doublePointer ratioptr , mutations newmuts, 
+			double tree_age, double threshold, double loc)
+	{
+	  node mutatenode = null;
+		
+	  if (nodeptr.getDescendents()[0] != null) {
+	    if (segFactory.segContains(nodeptr.getDescendents()[0].getSegment(), loc)) {
+				
+	      double temp = (double)(nodeptr.getGen() - nodeptr.getDescendents()[0].getGen())/ tree_age;
+	      ratioptr.setDouble(ratioptr.getDouble()+temp);
+				
+	      if (ratioptr.getDouble() > threshold) {
+	    	  newmuts.setAncNode1(nodeptr);
+	    	  newmuts.setAncNode2(nodeptr.getDescendents()[0]);
+	    	  return nodeptr.getDescendents()[0];
+	      }
+				
+	      mutatenode = mutateRecurse (nodeptr.getDescendents()[0], 
+					   ratioptr, 
+					   newmuts, tree_age, 
+					   threshold, loc);
+	      if (mutatenode != null) return mutatenode;
+	      /* this happens if we place a mutation inside this recursion. */
+	    }
+	  }	
+	  else return null;
+
+
+	  if ((nodeptr.getDescendents()[1]!= null) &&
+	      (segFactory.segContains(nodeptr.getDescendents()[1].getSegment(), loc))) {
+		  
+	    double temp = (double) (nodeptr.getGen() 
+				   - nodeptr.getDescendents()[1].getGen())
+	      / tree_age;
+	    ratioptr.setDouble(ratioptr.getDouble() + temp);
+			
+	    if (ratioptr.getDouble() > threshold) {
+	      newmuts.setAncNode1(nodeptr);
+	      newmuts.setAncNode2(nodeptr.getDescendents()[1]);
+	      return nodeptr.getDescendents()[1];
+	    }
+	    mutatenode = mutateRecurse (nodeptr.getDescendents()[1], 
+					 ratioptr,
+					 newmuts, tree_age, 
+					 threshold, loc);
+	    if (mutatenode != null) return mutatenode;
+	    /* this happens if we place a mutation inside this recursion. */
+			
+	  }
+	  return null;
 	}
 	/* mutate_descendents
 	 * also inserts them in numerical order.
@@ -165,6 +192,7 @@ public class mutations {
 		}
 	}
 	public void mutatePrint(File aFile,mutations aMut,mutList aMutList,hap aHap){
+		try{
 		int i = 0,ichr;
 		String out;
 		mutNodeList tempMNList;
@@ -206,6 +234,19 @@ public class mutations {
 		aMutList.setPos(aMutList.getNumMut(), aMut.getLocation());
 		aMutList.setNumMut(aMutList.getNumMut() + 1);
 		out = out + "\n";
-		//write out out 
+		
+		
+		FileWriter fileOut = new FileWriter(aFile.getName(),true);
+			
+		
+		BufferedWriter outwriter = new BufferedWriter(fileOut);
+		outwriter.write(out);
+		outwriter.close();
+		
+	
 	}
+	catch(Exception e){
+		e.printStackTrace();
+	}
+}
 }
