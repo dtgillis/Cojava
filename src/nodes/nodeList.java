@@ -6,28 +6,28 @@ public class nodeList {
 
 	
 	private final int NODELIST_INITSIZE = 200;
-	int numMembers,sizeNow;
+	int sizeNow;
 	ArrayList<node> nodes;
 	
 	public nodeList(){
-		numMembers = 0 ;
+		//numMembers = 0 ;
 		sizeNow = NODELIST_INITSIZE;
 		nodes = new ArrayList<node>(NODELIST_INITSIZE);
 	}
 	public void addNode(node aNode){
-		if(numMembers >= sizeNow -1){
-			sizeNow *= 2;
+		//if(numMembers >= sizeNow -1){
+		//	sizeNow *= 2;
 			//array list handles size dynamically 
-		}
-		nodes.add(numMembers, aNode);
-		numMembers++;
+		//}
+		nodes.add(aNode);
+		//numMembers++;
 	}
 	public void removeNode(node aNode){
 		
 		for(int i=0;i<nodes.size();i++){
 			if(nodes.get(i).getName() == aNode.getName()){
 				nodes.remove(i);
-				numMembers--;
+				//numMembers--;
 				return;
 			}
 		}
@@ -38,7 +38,7 @@ public class nodeList {
 		}
 	}
 	public int getNumMembers(){
-		return numMembers;
+		return nodes.size();
 	}
 	public int getSizeNow(){
 		return sizeNow;
