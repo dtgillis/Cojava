@@ -23,7 +23,7 @@ final double  NDIV = (1+IMM1/NTAB);
 final  double EPS = 1.2e-12;
 final  double  RNMX = (1.0-EPS);
 long randseed;
- SecureRandom generator = new SecureRandom();
+SecureRandom generator;
  long idum2,iy;
  long[] iv;
  
@@ -31,11 +31,12 @@ long randseed;
 	 idum2 = 123456789;
 	 iy = 0;
 	 iv = new long[NTAB];
+	 generator = new SecureRandom();
  }
 public  double randomDouble(){
 	
-	//return ran2(randseed);
-	return generator.nextDouble();
+	return ran2(randseed);
+	//return generator.nextDouble(;
 	
 	}
 public  void setRngSeed(long rseed){
@@ -50,17 +51,11 @@ public  long seedRNG(){
 }
 public  void seedRandom(){
 	long newSeed;
-	//long pid = getPid();
-	//pid = generator.nextLong();
-	//pid = pid*65538;
-	//Date time = new Date();
-	//tim = time.getTime();
-	//newSeed = (long) Math.pow(pid,tim);
 	newSeed = generator.nextInt();
-	//newSeed = Math.abs(newSeed);
 	newSeed = Math.abs(newSeed);
-	newSeed *= (-1);
 	randseed = newSeed;
+	newSeed *= (-1);
+	ran2(newSeed);
 	
 	
 }
@@ -98,11 +93,4 @@ double ran2(long idum)
         else return temp;
 }
 
-private long getPid(){
-	String name = ManagementFactory.getRuntimeMXBean().getName();
-	int p = name.indexOf('@');
-	String pid = name.substring(0,p);
-	return Long.parseLong(pid);
-	
-}
 }
