@@ -46,8 +46,8 @@ public class demography {
 
 	}
 	public void initRecomb(){//dg_init_recomb()
-		recombSites = addRecombSite(0.0,null);
-		recombSites = addRecombSite(1.0,recombSites);
+		recombSites = addRecombSite2(0.0,null);
+		recombSites = addRecombSite2(1.0,recombSites);
 		numSites = 1; 
 		
 	}
@@ -60,6 +60,54 @@ public class demography {
 	public siteList getRecombSites(){//dg_recombsites()
 		return recombSites;
 	}
+	public siteList addRecombSite2(double site, siteList sitelistptr) 
+		{
+		  siteList newsitelist, thislistptr, lastlistptr;
+
+		  /* 1. check if site belongs at the top of the list.
+		   * 2. loop through list.
+		   * 3. check if site already exists in the list.
+		   * 4. add new site.
+		   */
+		  /* Modify: eliminate recursion (which blows up if the stack gets too deep). sfs */
+
+		  if (sitelistptr == null) {
+		    newsitelist = new siteList();
+		    
+
+		    newsitelist.setSite(site);
+		    newsitelist.setNext(sitelistptr);
+		    newsitelist.setNNode(totMembers);
+		    numSites++;
+		    return newsitelist;
+		  }
+
+		  thislistptr = sitelistptr.getNext();
+		  lastlistptr = sitelistptr;
+
+		  while (thislistptr != null) {
+		    if (thislistptr.getSite() == site) {return sitelistptr;}
+		    if (thislistptr.getSite() > site) {
+		      newsitelist = new siteList();
+		      newsitelist.setSite(site);
+		      newsitelist.setNext( thislistptr);
+		      newsitelist.setNNode(lastlistptr.getNNode());
+		      lastlistptr.setNext(newsitelist);
+		      numSites++;
+		      return sitelistptr;
+		    }
+		    lastlistptr = thislistptr;
+		    thislistptr = thislistptr.getNext();
+		  }
+		  newsitelist = new siteList();
+		  newsitelist.setSite(site);
+		  newsitelist.setNext(null);
+		  newsitelist.setNNode(0);
+		  lastlistptr.setNext(newsitelist);
+		  numSites++;
+		  return sitelistptr;
+		}
+	
 	public siteList addRecombSite(double site, siteList aSiteList ) {
 		siteList newSiteList, thisList, lastList;
 			/* 1. check if site belongs at the top of the list.
@@ -70,9 +118,6 @@ public class demography {
 		  /* Modify: eliminate recursion (which blows up if the stack gets too deep). sfs */
 		if(aSiteList == null){
 			newSiteList = new siteList();
-			//if(newSiteList == null){
-				//dgExit("Add recomb Site error");
-			//}
 			newSiteList.setSite(site);
 			newSiteList.setNext(aSiteList);
 			newSiteList.setNNode(totMembers);
@@ -95,7 +140,7 @@ public class demography {
 				numSites ++;
 				return aSiteList;
 			}
-			lastList = thisList;
+			lastList = lastList.getNext();
 			thisList = thisList.getNext();
 		
 		}
@@ -356,7 +401,7 @@ public class demography {
 			aPop.addNode(newNode1);
 			aPop.addNode(newNode2);
 			//step 6
-			recombSites = addRecombSite(loc,recombSites);
+			recombSites = addRecombSite2(loc,recombSites);
 			//step 7 
 			dgLog(RECOMBINE,gen,aNode,newNode1,newNode2,aPop,loc);
 			returnNodes = new node[3];
@@ -407,9 +452,9 @@ public class demography {
 			
 			//step 6
 			if (segFactory.segContains(aNode.getSegment(), loc))
-				recombSites = addRecombSite(loc,recombSites);
+				recombSites = addRecombSite2(loc,recombSites);
 			if(segFactory.segContains(aNode.getSegment(), locend))
-				recombSites = addRecombSite(locend,recombSites);
+				recombSites = addRecombSite2(locend,recombSites);
 			//step 7 
 			dgLog(GENE_CONVERSION,gen,aNode,newNode1,newNode2,aPop,loc,locend);
 			returnNodes = new node[3];
@@ -474,6 +519,105 @@ public class demography {
 			return aPop.getMembers().getNumMembers();
 		
 	}
+	public boolean doneCoalescent2(){
+		
+		   siteList  sitetemp = recombSites;
+		  int     nonemptypopcount = 0, i;
+		  boolean contains;
+		  population     popptr=null, temppopptr;
+		  node    nodeptr, tempnodeptr=null;
+		  double loc;
+		  seg tseg;
+
+			/*
+			 * so i don't want to delete the pops right away, but i don't
+			 * want to count empty pops either. so we count non-empty pops
+			 * instead of deleting them. If there is more than one non-empty
+			 * pop, we know we're not done.
+			*/
+
+		 	for (i = this.getNumPops() - 1; i >= 0; i--) {
+				temppopptr = this.getPopByIndex(i);
+				if ( temppopptr.getNumNodes() > 0) {  
+					nonemptypopcount++;
+					popptr = temppopptr;
+				}
+			}
+
+			if (nonemptypopcount > 1) return false;
+
+			/* 
+			 * Now check each member of the last population and move
+			 * out all the regions that have coalesced. 
+			 * The regions moved out go into a "completepop" where they
+			 * do not participate in further simulation and await mutation.
+			 * If the entire chromosome is coalesced, we're done.
+			 */
+
+			if (popptr.getMembers().getNumMembers() > 1) {     
+			    //printf("done_coal num in pop left: %d \n",popptr->members.nummembers);
+			  while (sitetemp.getNext() != null) {
+			    if (sitetemp.getNNode() == 1) {
+			      loc = (sitetemp.getSite() + sitetemp.getNext().getSite()) / 2;
+			      for (i = 0; i < popptr.getMembers().getNumMembers(); i++) {
+				/* Unoptimized:*/
+				 nodeptr = popptr.getNode(i);
+				/* Optimized, but fragile: */
+				//nodeptr = popptr.getMembers().getNode(popptr.getMembers().getNumMembers() - i - 1); 
+				/* Start hardwired optimization (from seg_contains(), segment.c) */
+				tseg = nodeptr.getSegment();
+				contains = false;
+				while (tseg != null) {
+				  if (loc >= tseg.getBegin()) {
+				    if (loc <= tseg.getEnd()) {
+				      contains = true;
+				      tempnodeptr = nodeptr;
+				      break;
+				    }
+				    tseg = tseg.getNext();
+				  }
+				  else { 
+				    contains = false;
+				    break;
+				  }
+				}
+				/* end optimization */
+				assert(contains = true);
+			      }
+			      this.addToCompletePopulation(tempnodeptr, 
+						     popptr, 
+						     sitetemp.getSite(), 
+						     sitetemp.getNext().getSite());
+			      sitetemp.setNNode(0);
+			    }
+			    sitetemp = sitetemp.getNext();
+			  }
+			}
+
+			if (popptr.getMembers().getNumMembers() < 2) {
+				tempnodeptr = popptr.getMembers().getNode(0);
+				//fprintf(stdout,"did %d recombsites", demography_data.numsites);
+				
+				completePop.addNode(tempnodeptr);
+				popptr.removeNode(tempnodeptr);
+				if (DEMOG_DEBUG) {
+					//fprintf(stdout, 
+						//"the following %d nodes are left:\n", 
+						//completepop->members.nummembers);
+					//for (i = 0; 
+					  //   i < demography_data.completepop->members.nummembers; i++)
+						//print_node(pop_get_node 
+							//   (i, 
+							  //  &(demography_data.completepop->members)));
+				}  
+				return true;
+			}
+
+			return false;
+		}
+
+
+	
 	public boolean doneCoalescent(){
 		siteList siteTemp = recombSites;
 		int nonEmptyPopCount =0;
