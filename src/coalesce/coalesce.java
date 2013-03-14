@@ -1,7 +1,6 @@
 package coalesce;
 
 import cosiRand.randomNum;
-import coalescent.CoalescentMain;
 import demography.demography;
 
 public class coalesce {
@@ -22,7 +21,7 @@ public class coalesce {
 			numNodes = dem.getNumNodesInPopByIndex(i);
 			popSize = dem.getPopSizeByIndex(i);
 			if(numNodes>1){
-				rate+=(double)(numNodes*(numNodes-1))/(4* popSize);
+				rate+=(double)(numNodes*(numNodes-1))/(4 * popSize);
 			}
 			
 		}
