@@ -1,5 +1,7 @@
 package sweep;
 
+import java.io.IOException;
+
 import cosiRand.poisson;
 import cosiRand.randomNum;
 import coalescent.CoalescentMain;
@@ -9,6 +11,7 @@ import pointers.doublePointer;
 import pop.population;
 import recomb.recListMaker;
 import segment.seg;
+import segment.segWorker;
 import nodes.node;
 import nodes.nodeWorker;
 import geneConversion.gc;
@@ -26,13 +29,15 @@ public class sweep {
 	randomNum random;
 	poisson poissoner;
 	nodeWorker nodeFactory;
-	public sweep(demography adem,recListMaker aRecomb,gc aGeneConverter,randomNum aRNG,poisson aPois,nodeWorker aNodeFactory){
+	segWorker segFactory;
+	public sweep(demography adem,recListMaker aRecomb,gc aGeneConverter,randomNum aRNG,poisson aPois,nodeWorker aNodeFactory,segWorker aSegFactory){
 		random = aRNG;
 		geneConversion = aGeneConverter;
 		dem = adem;
 		recomb = aRecomb;
 		poissoner = aPois;
 		nodeFactory = aNodeFactory;
+		segFactory = aSegFactory;
 	}
 	public void sweepInitMut(mutList ml,hap aHap){
 		aMutList = ml;
@@ -267,7 +272,7 @@ public class sweep {
 			}
 			
 		}
-		aMut = new mutations(dem);
+		aMut = new mutations(dem,segFactory);
 		aMut.setLocation(selPos);
 		aMut.setMutNodes(null);
 		aMut.setAncNode1(null);
