@@ -24,7 +24,6 @@ public class out {
 		int[] chrCount,mutSort,mutCount = null,useMut = null;
 		String fileName , idstr;
 		int[] aHap;
-		//File outfile;
 		double freq;
 		
 		chrCount = new int[haplos.getnPop()];
@@ -43,7 +42,7 @@ public class out {
 		}
 		this.setSortVals(aMutList.getPos());
 		//sort mutSort according to sortVals...
-		double[] tempVal = deepCopy(sortVals);
+		double[] tempVal = deepCopy(sortVals,aMutList.getNMut());
 		Arrays.sort(tempVal);
 		for(i=0;i<tempVal.length;i++){//
 			double temp = sortVals[i];
@@ -74,8 +73,8 @@ public class out {
 					outWriter.write(String.format("%d\t%d\t",ichr,haplos.getPopId()[ipop]));
 					for(im=0;im<aMutList.getNMut();im++){aHap[im] = 2;}
 					for(i=0;i<haplos.getnMut()[ichr];i++){
-						aHap[haplos.getMutIndex().get(ichr)[i]] = 1;
-						mutCount[haplos.getMutIndex().get(ichr)[i]]++;
+						aHap[haplos.getMutIndex()[ichr][i]] = 1;
+						mutCount[haplos.getMutIndex()[ichr][i]]++;
 					}
 					for(im=0;im<aMutList.getNMut();im++){
 						if(useMut[mutSort[im]]==1){
@@ -123,9 +122,9 @@ public class out {
 	public void setSortVals(double[] aSort){
 		sortVals = aSort;
 	}
-	private double[] deepCopy(double[] anArray){
-		double[] temp = new double[anArray.length];
-		for(int i=0;i<anArray.length;i++){
+	private double[] deepCopy(double[] anArray,int size){
+		double[] temp = new double[size];
+		for(int i=0;i<size;i++){
 			temp[i] = anArray[i];
 		}
 		return temp;
