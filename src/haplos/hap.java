@@ -5,7 +5,7 @@ import java.util.ArrayList;
 public class hap {
 	int nPop,nChrom;
 	int[] popId,whichPopInd,mutArraySize,nMut;
-	ArrayList<int[]> mutIndex;
+	int[][] mutIndex;
 	public hap(){
 		
 	}
@@ -57,18 +57,17 @@ public class hap {
 	public void setPopId(int[] pipId) {
 		this.popId = pipId;
 	}
-	public void setMutIndex(int index,int[] data){
-		this.mutIndex.add(data);
+	public void setMutIndex(int index1,int index2,int data){
+		this.mutIndex[index1][index2] = data;
 	}
-	public ArrayList<int[]> getMutIndex() {
+	public int[][] getMutIndex() {
 		return mutIndex;
 	}
-	public void setMutIndex(ArrayList<int[]> aMutIndex) {
+	public void setMutIndex(int[][] aMutIndex) {
 		this.mutIndex = aMutIndex;
 	}
-	public void setMutIndex(int index1,int index2,int data ){
-		int[] temp = mutIndex.get(index1);
-		temp[index2] = data;
-		mutIndex.add(index1,temp);
+	public void setMutIndex(int index, int[] data){
+		this.mutIndex[index] = data;
 	}
+	
 }

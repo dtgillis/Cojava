@@ -33,7 +33,7 @@ public class hapWorker {
 		haplos.setWhichPopInd(new int[running]);
 		haplos.setMutArraySize(new int[running]);
 		haplos.setnMut(new int[running]);
-		haplos.setMutIndex(new ArrayList<int[]>(running));
+		haplos.setMutIndex(new int[running][INIT_SIZE]);
 		assert(haplos.getWhichPopInd()!=null);
 		assert(haplos.getMutIndex()!=null);
 		assert(haplos.getMutArraySize()!=null);
@@ -47,7 +47,7 @@ public class hapWorker {
 			for(int i = 0;i<nchr;i++){
 				chromIndex = aPop.getNode(i).getName();
 				haplos.setMutArraySize(chromIndex, INIT_SIZE);
-				haplos.setMutIndex(chromIndex, new int[INIT_SIZE]);
+				//haplos.setMutIndex(chromIndex, new int[INIT_SIZE]);
 				haplos.setWhichPopInd(chromIndex,ipop);
 				}
 			running += nchr;
