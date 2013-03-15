@@ -28,7 +28,7 @@ public class sim {
 		double coalesceRate,migrateRate,geneConvRate,recombRate,poissonRate,theta;
 		int fixedNumMut;
 		poisson poissoner;
-		final boolean DEBUG = false;
+		final boolean DEBUG = true;
 		demography dem;
 		gc geneConversion;
 		recListMaker recomb;
@@ -67,7 +67,7 @@ public class sim {
 		 * there are no historical events left.
 		 *
 		 */
-		public double simExecute(){
+		public double simExecute() throws InterruptedException{
 			double gen=0,historicalEventTime,poissonEventTime;
 			boolean coal =false;
 			boolean completeFlag = false;
@@ -76,20 +76,19 @@ public class sim {
 				historicalEventTime = (double) simGetHistEvent(gen);
 				poissonEventTime = this.simGetPoisEvent();
 				if(DEBUG){
-					//System.out.println(String.format("recomb: %f coalesce: %f migrate: %f geneconvert: %f \n",
-					//		recombRate,coalesceRate,migrateRate,geneConvRate));
+					System.out.println(String.format("recomb: %f coalesce: %f migrate: %f geneconvert: %f \n",
+							recombRate,coalesceRate,migrateRate,geneConvRate));
 					System.out.println(String.format("poisson time: %f, hist time: %f",poissonEventTime,historicalEventTime));
 				}
 				if(historicalEventTime < 0 || poissonEventTime < historicalEventTime){
 					gen += poissonEventTime;
 					coal = simDoPoisson(gen);
-					if(coal){completeFlag = dem.doneCoalescent();}
-					
+					if(coal){completeFlag = dem.doneCoalescent2();}
 				}
 				else{
 					gen += historicalEventTime;
 					gen = histFactory.historicalEventExecute(gen);
-					completeFlag = dem.doneCoalescent();
+					completeFlag = dem.doneCoalescent2();
 				}
 				
 			}
@@ -120,8 +119,8 @@ public class sim {
 			double[] reglen,probRegion,treeTime;
 			//double probRegion,treeTime;
 			int[] nMutByRegion = null;
-			FileWriter fileOut = new FileWriter(aFile.getName(),true);
-			BufferedWriter out = new BufferedWriter(fileOut);
+			//FileWriter fileOut = new FileWriter(aFile.getName(),true);
+			//BufferedWriter out = new BufferedWriter(fileOut);
 			numRegions = dem.getNumRegs();
 			// print mutate headers....
 			reglen = new double[numRegions];
@@ -140,6 +139,8 @@ public class sim {
 				cosiRand.multiNom.multinom(numRegions, fixedNumMut, probRegion, nMutByRegion);
 			}
 			for(reg=0;reg<numRegions;reg++){
+				FileWriter fileOut = new FileWriter(aFile.getName(),true);
+				BufferedWriter out = new BufferedWriter(fileOut);
 				begin = dem.regBegin(reg);
 				
 				if(fixedNumMut==-1){
@@ -157,7 +158,9 @@ public class sim {
 									begin,reglen[reg],(int) treeTime[reg],0,numMuts));
 					}
 					
+					
 				}
+				out.close();
 				summut += numMuts;
 				for(i=0;i<numMuts;i++){
 					loc = begin + random.randomDouble()*reglen[reg];
