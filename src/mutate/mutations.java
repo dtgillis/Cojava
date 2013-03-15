@@ -210,11 +210,13 @@ public class mutations {
 			out = out + String.format("%d ", tempMNList.getNodeName());
 			ichr = tempMNList.getNodeName();
 			if(aHap.getnMut()[ichr] == aHap.getMutArraySize()[ichr]){
+				int oldsize = aHap.getMutArraySize()[ichr];
 				aHap.setMutArraySize(ichr, aHap.getMutArraySize()[ichr]*2);
 				int[] temp = new int[aHap.getMutArraySize()[ichr]];
+				
 				//aHap.setMutIndex(ichr, new int[aHap.getMutArraySize()[ichr]]);
-				for(i=0;i<aHap.getMutIndex().get(ichr).length;i++){
-					temp[i] = aHap.getMutIndex().get(ichr)[i];
+				for(i=0;i<oldsize;i++){
+					temp[i] = aHap.getMutIndex()[ichr][i];
 				}
 				aHap.setMutIndex(ichr, temp );
 			}
