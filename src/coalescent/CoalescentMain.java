@@ -2,16 +2,16 @@ package coalescent;
 
 import java.io.IOException;
 
-import bottleNeck.bottleNeck;
-
 import migration.migrationWorker;
 import mutate.mutList;
 import mutate.mutations;
 import nodes.nodeWorker;
+import out.out;
 import recomb.recListMaker;
 import segment.segWorker;
 import simulator.sim;
 import sweep.sweep;
+import bottleNeck.bottleNeck;
 import coalesce.coalesce;
 import cosiRand.poisson;
 import cosiRand.randomNum;
@@ -43,7 +43,7 @@ public class CoalescentMain {
 	static segWorker segFactory;
 	static bottleNeck bottleneck;
 	static poisson poissoner;
-	public static void main(String[] args) {
+	public static void main(String[] args) throws InterruptedException {
 		// get and process arguments
 		fileHolder = new ArgHandler(args);
 		fileHolder.setArguments();
@@ -56,18 +56,19 @@ public class CoalescentMain {
 		nodeFactory = new nodeWorker(segFactory);
 		dem = new demography(nodeFactory,segFactory,random);
 		dem.setLogFile(fileHolder.getLogFile());
+		mutate = new mutations(dem,segFactory);
 		recomb = new recListMaker(dem, random);
 		geneConversion = new gc(dem, random);
 		migFactory = new migrationWorker(dem);
 		bottleneck = new bottleNeck(dem,poissoner);
-		histFactory = new histWorker(dem, migFactory, sweeper, null);
+		histFactory = new histWorker(dem, migFactory, sweeper, bottleneck);
 		coalesce = new coalesce(dem, random);
 		simulator = new sim(dem, poissoner, geneConversion, recomb, random, histFactory, coalesce, migFactory, mutate);
 		
 		//now assign all the  info in our paramater file....
 		inputHandler = new fileReader(fileHolder, dem, recomb, simulator, geneConversion, histFactory, random);
 		inputHandler.paramFileProcess();
-		sweeper = new sweep(dem, recomb, geneConversion, random, poissoner, nodeFactory);
+		sweeper = new sweep(dem, recomb, geneConversion, random, poissoner, nodeFactory, segFactory);
 		aMutList = new mutList();//mutlist init
 		hapFactory = new hapWorker(haps, dem);
 		hapFactory.hapAssignChroms();
@@ -75,12 +76,20 @@ public class CoalescentMain {
 		sweeper.sweepInitMut(aMutList, haps);
 		simulator.simExecute();
 		try {
-			simulator.simMutate(fileHolder.getOutFile(), aMutList, haps);
+			simulator.simMutate(fileHolder.getSegFile(), aMutList, haps);
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		
+		out outwriter = new out();
+		if(fileHolder.outFileSet){
+			try {
+				outwriter.printHaps("out", recomb.getLength(), aMutList, haps);
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
 		
 		
 		
