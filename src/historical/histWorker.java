@@ -1,15 +1,10 @@
 package historical;
 
-import java.util.ArrayList;
 import java.util.StringTokenizer;
 
-import bottleNeck.bottleNeck;
-
-import sweep.sweep;
-
 import migration.migrationWorker;
-
-import coalescent.CoalescentMain;
+import sweep.sweep;
+import bottleNeck.bottleNeck;
 import demography.demography;
 
 public class histWorker {
