@@ -1,7 +1,5 @@
 package haplos;
 
-import java.util.ArrayList;
-
 public class hap {
 	int nPop,nChrom;
 	int[] popId,whichPopInd,mutArraySize,nMut;

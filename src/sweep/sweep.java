@@ -1,10 +1,7 @@
 package sweep;
 
-import java.io.IOException;
-
 import cosiRand.poisson;
 import cosiRand.randomNum;
-import coalescent.CoalescentMain;
 import demography.demography;
 import demography.siteList;
 import pointers.doublePointer;

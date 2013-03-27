@@ -94,34 +94,41 @@ public class recListMaker {
 		return recombRate;
 	}
 	public node[] recombExecute(double gen,int popIndex, doublePointer location){
-		double loc;
-		double temp,temp1;
-		recombStructure tempRecomb = recombs;
-		double rr = 0 ;
-		double end;
-		
-		temp1 = random.randomDouble();
-		temp = (double) (temp1 * (recombRate));
-		
-		while (tempRecomb != null && tempRecomb.startBase < length && rr < temp){
-			if(tempRecomb.next==null|| tempRecomb.next.startBase > length){
-				rr += (length - tempRecomb.startBase)* tempRecomb.rate;
-			}
-			else{
-				rr += (tempRecomb.next.startBase - tempRecomb.startBase) * tempRecomb.rate;
-			}
-			if(rr < temp){
-				tempRecomb = tempRecomb.next;
-			}
-		}
-		
-		if(tempRecomb.next == null || tempRecomb.next.startBase > length)
-			end = length;
-		else end = tempRecomb.next.startBase;
-		
-		loc = (double) ((int) (end - (rr - temp)/ tempRecomb.rate)) / length;
-		location.setDouble(loc); // pointer magic ?
-		return dem.recombineByIndex(popIndex, gen, loc);
+		/*  pick location */  
+		  double loc;
+		  double temp;
+		  double temp1;
+		  recombStructure temprecomb = recombs;
+		  double rr = 0;
+		  double end;
+				       
+		  /* choosing location.. */
+		  temp1 = random.randomDouble();
+		  temp = (double) (temp1 * (recombRate));
+
+		  while (temprecomb != null && temprecomb.startBase < length && rr < temp) {
+		    if (temprecomb.next == null || 
+			temprecomb.next.startBase > length) {
+		      rr += (length - temprecomb.startBase) * temprecomb.rate;
+		    }
+		    else {
+		      rr += (temprecomb.next.startBase - temprecomb.startBase) * 
+			temprecomb.rate;			
+		    }
+
+		    if (rr < temp) {
+		      temprecomb = temprecomb.next;
+		    }
+		  }
+
+		  if (temprecomb.next == null || temprecomb.next.startBase > length)
+		    end = length;
+		  else end = temprecomb.next.startBase;
+
+		  loc = (double)((int) (end - (rr - temp) / temprecomb.rate)) / length;
+		  location.setDouble(loc);
+
+		  return dem.recombineByIndex(popIndex, gen, loc);
 	}
 	public double recombGetRate(){
 		int numPops = dem.getNumPops();
@@ -142,7 +149,7 @@ public class recListMaker {
 		     It assumes that get_rate has been called immediately before this 
 		     function, with no change in the number of chromosomes since. sfs */
 		int popIndex =0,i,numNodes;
-		double randCounter = random.randomDouble() * lastRate;
+		double randCounter = random.randomDouble() * recombGetRate();
 		double rate = 0;
 		int numPops = dem.getNumPops();
 		

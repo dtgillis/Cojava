@@ -2,9 +2,7 @@ package geneConversion;
 
 import pointers.doublePointer;
 import nodes.node;
-import cosiRand.ranBinom;
 import cosiRand.randomNum;
-import coalescent.CoalescentMain;
 import demography.demography;
 
 public class gc {
@@ -18,7 +16,6 @@ public class gc {
 		gcRate = 0;
 		lastGCRate = 0;
 		gcLength = 500; //in bp
-		//random = new ranBinom();
 		dem = adem;
 		random = aRNG;
 	}
@@ -70,17 +67,21 @@ public class gc {
 		return popIndex;
 	}
 	public node[] execute(double gen , int popIndex,doublePointer location1,doublePointer location2){
-		double loc,loc2;
-		double temp,temp1;
-		//choosing location..
-		temp1 = random.randomDouble();
-		temp = (double) (temp1*gcRate);
-		loc = (double) ((int)(temp/gcRate*(length + gcLength) - gcLength)) / length ;
-		loc2 = (double) ((int)(temp/gcRate * (length + gcLength)))/length;
-		
-		if(loc2>length) loc2 = length;
-		location1.setDouble(loc);
-		location2.setDouble(loc2);		
-		return dem.gcByIndex(popIndex, gen, loc, loc2);
+		double loc, loc2;
+		  double temp;
+		  double temp1;
+		  /* choosing location.. */
+		  temp1 = random.randomDouble();
+		  temp = (double) (temp1 * (gcRate));
+		  
+		  loc = (double)((int) (temp / gcRate * 
+					(length + gcLength) - gcLength)) / length;
+		  loc2 = (double)((int) (temp / gcRate * (length + gcLength))) / length;
+		  
+		  if (loc2 > length) loc2 = length;
+		  location1.setDouble(loc);
+		  location2.setDouble(loc2);
+		  
+		  return dem.gcByIndex(popIndex, gen, loc, loc2);
 	}
 }

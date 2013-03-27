@@ -4,10 +4,9 @@ import java.util.Random;
 
 public class ranBinom {
 	final int BTHRESH = 50;
-	Random generator;
-	static Random staticGenerator = new Random();
-	public ranBinom(){
-		generator = new Random();
+	randomNum random;
+	public ranBinom(randomNum aRNG){
+		random = aRNG;
 	}
 	public int ranbinom(int n, double p){
 		/** 
@@ -29,12 +28,12 @@ public class ranBinom {
 	}
 	public double ranexp(){
 		double x,t;
-		t = generator.nextDouble();
+		t = random.randomDouble();
 		x = - Math.log(1.0-t);
 		return x;
 		
 	}
-	public static double randev0(double a){
+	public  double randev0(double a){
 		/**
 		   algorithm G6: Gamma for a < 1
 		  */
@@ -43,7 +42,7 @@ public class ranBinom {
 		double p = t/(t+a*Math.exp(-t));
 		double s = 1.0/a;
 		for(;;){
-			r1 = staticGenerator.nextDouble();
+			r1 = random.randomDouble();
 			if(r1<=p){
 				x = t*( Math.pow(r1/p, s));
 				w = x;
@@ -52,7 +51,7 @@ public class ranBinom {
 				x = t + Math.log((1.0-p)/ (1.0-r1));
 				w = t * Math.log(x/t);
 			}
-			r2 = staticGenerator.nextDouble();
+			r2 = random.randomDouble();
 			if((1.0-r2)<=w){
 				if((1.0/r2 -1.0) <= w)
 					continue;
@@ -62,7 +61,7 @@ public class ranBinom {
 			return x;
 		}
 	}
-	public static double randev1(double a){
+	public  double randev1(double a){
 		 /**
 		   Random gamma deviate:  a>=1
 		   GBEST algorithm  (D.J. BEST: Appl. Stat. 29 p 181 1978
@@ -72,7 +71,7 @@ public class ranBinom {
 		c = 3.0 * a -.75;
 		
 		for(;;){
-			r1 = staticGenerator.nextDouble();
+			r1 = random.randomDouble();
 			g = r1 - (r1*r1);
 			if(g<=0.0)
 				continue;
@@ -80,7 +79,7 @@ public class ranBinom {
 			x = e+f;
 			if (x<=0.0)
 				continue;
-			r2 = staticGenerator.nextDouble();
+			r2 = random.randomDouble();
 			d = 64.0 * r2 * r2 * g * g * g;
 			if((d>=1.0-2.0*f*f/x) && (Math.log(d)>= 2.0 * (e*Math.log(x/e)-f)))
 				continue;
@@ -97,7 +96,7 @@ public class ranBinom {
 		    int cnt = 0, i ;
 
 		    for (i=0 ; i< n ; i++)  {
-		     if (generator.nextDouble() <= p) ++cnt ;
+		     if (random.randomDouble() <= p) ++cnt ;
 		    }
 
 		    return cnt ;
@@ -124,6 +123,6 @@ public class ranBinom {
 		  return randev1(a);
 	}
 	public double getRandomDouble(){
-		return generator.nextDouble();
+		return random.randomDouble();
 	}
 }

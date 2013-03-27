@@ -42,7 +42,7 @@ public class demography {
 		completePop = new population(-1,0,"complete_nodes".toCharArray());
 		segFactory = aSegFactory;
 		random = aRNG;
-		randBinom = new ranBinom();
+		randBinom = new ranBinom(aRNG);
 
 	}
 	public void initRecomb(){//dg_init_recomb()
@@ -275,13 +275,14 @@ public class demography {
 		this.coalesceByName(aPop.getPopName(), gen);
 	}
 	public void coalesceByName(int popName,double gen){
-		population aPop;
-		int node1Index,node2Index,nodesAtLoc;
+		population popptr;
+		int node1index, node2index, nodesatloc; 
 		boolean contains;
-		node aNode1,aNode2,newNode;
-		siteList siteTemp = recombSites;
+		node node1, node2, newnode;
+		siteList  sitetemp = recombSites;
 		double loc;
-		seg tSeg;
+		seg tseg;
+	  
 		/* 
 		 * 1. Choose two unique nodes.
 		 * 2. Coalesce them, creating newnode.
@@ -290,77 +291,78 @@ public class demography {
 		 * 4. Add new node to population.
 		 * 5. Log it.
 		 */ 
-		aPop = this.getPopByNameInt(popName,pops);
-		//step 1
-		node1Index = (int)(random.randomDouble() *aPop.getMembers().getNumMembers());
-		node2Index = (int)(random.randomDouble() *aPop.getMembers().getNumMembers() - 1);
-		
-		if(node2Index >= node1Index) node2Index++;
-		aNode1 = aPop.getNode(node1Index);
-		aNode2 = aPop.getNode(node2Index);
-		//step 2
-		newNode = nodeFactory.nodeCoalesce(aNode1, aNode2, gen);
-		
-		//step 2a
-		while(siteTemp.getNext()!=null){
-			if(siteTemp.getNNode() >= 2){
-				loc = (siteTemp.getSite() + siteTemp.getNext().getSite()) /2;
-				nodesAtLoc = 0;
-				tSeg = aNode1.getSegment();
-				contains = false;
-				while (tSeg!=null){
-					if(loc>=tSeg.getBegin()){
-						if(loc<= tSeg.getEnd()){
-							contains = true;
-							break;
-						}
-						tSeg = tSeg.getNext();
-					}
-					else{
-						contains = false;
-						break;
-						
-					}
-				}
-				if(contains){
-					nodesAtLoc++;
-					
-				}
-				tSeg = aNode2.getSegment();
-				contains = false;
-				while(tSeg!=null){
-					if(loc>=tSeg.getBegin()){
-						if(loc<=tSeg.getEnd()){
-							contains = true;
-							break;
-						}
-						tSeg = tSeg.getNext();
-					}
-					else{
-						contains = false;
-						break;
-					
-					}
-				}
-				if(contains){
-					nodesAtLoc++;
-					
-				}
-				
-				if(nodesAtLoc>1){
-					siteTemp.setNNode(siteTemp.getNNode()-1);
-				}
+
+		popptr = getPopByNameInt (popName,pops);
+
+		/* STEP 1 */
+		node1index = (int) (random.randomDouble() * popptr.getMembers().getNumMembers());
+		node2index = (int) (random.randomDouble() * (popptr.getMembers().getNumMembers() - 1));
+
+		if (node2index >= node1index) node2index++;
+
+		node1 = popptr.getNode(node1index);
+		node2 = popptr.getNode(node2index);
+
+		/* STEP 2 */
+		newnode = nodeFactory.nodeCoalesce(node1, node2, gen);
+
+		/* STEP 2a */
+		while (sitetemp.next != null) {
+		  if (sitetemp.nnode >= 2) {
+		    loc = (sitetemp.site + sitetemp.next.site) / 2;
+		    nodesatloc = 0;
+		    tseg = node1.getSegment();
+		    contains = false;
+		    while (tseg != null) {
+		      if (loc >= tseg.getBegin()) {
+			if (loc <= tseg.getEnd()) {
+			  contains = true;
+			  break;
 			}
-			siteTemp = siteTemp.getNext();
+			tseg = tseg.getNext();
+		      }
+		      else { 
+			contains = false;
+			break;
+		      }
+		    }
+		    if (contains) {
+		      nodesatloc++;
+		    }
+		    tseg = node2.getSegment();
+		    contains = false;
+		    while (tseg != null) {
+		      if (loc >= tseg.getBegin()) {
+			if (loc <= tseg.getEnd()) {
+			  contains = true;
+			  break;
+			}
+			tseg = tseg.getNext();
+		      }
+		      else { 
+			contains = false;
+			break;
+		      }
+		    }
+		    if (contains) {
+		      nodesatloc++;
+		    }
+		    if (nodesatloc > 1) {
+		      sitetemp.nnode--;
+		    }
+		  }
+		  sitetemp = sitetemp.next;
 		}
+
+		/* STEP 3 */
+		popptr.removeNode(node1);
+		popptr.removeNode(node2);
 		
-		//step 3
-		aPop.removeNode(aNode1);
-		aPop.removeNode(aNode2);
-		//step 4
-		aPop.addNode(newNode);
-		//step 5
-		dgLog(COALESCE,gen,aNode1,aNode2,newNode,aPop);
+		/* STEP 4 */
+		popptr.addNode(newnode);
+
+		/* STEP 5 */
+		dgLog (COALESCE, gen, node1, node2, newnode, popptr);
 	}
 	//recombine
 	public node[] recombineByIndex(int popIndex,double gen, double loc){
@@ -503,7 +505,7 @@ public class demography {
 	public int getNumNodes(){//dg_get_num_nodes
 		int total = 0;
 		for(int i = 0; i<numPops; i++)
-			{total = getNumNodesInPopByIndex(i);}//should be plus = ?
+			{total += getNumNodesInPopByIndex(i);}//should be plus = ?
 		return total;
 	}
 	public int getNumNodesInPopByIndex(int popIndex){
@@ -815,7 +817,12 @@ public class demography {
 			break;
 		case HISTORICAL:
 			// HISTORICAL string_descriptions
-			string1 = args[0].toString();
+			string1 = "";
+			char[] anArr = (char[])args[0];
+			for(int i = 0;i<anArr.length;i++){
+				string1 = string1 + anArr[i];
+			}
+			
 			out = " " + gen + "\tH\t" + string1 + "\n";
 			outFile.write(out);
 			outFile.close();
@@ -831,6 +838,13 @@ public class demography {
 			out = "" + gen + "\tmig_rate\t" + aPop.getPopName() + " " + aPop2.getPopName() + " " + double1 + "\n";
 			//write out 
 			outFile.write(out);
+			outFile.close();
+			break;
+		case MOVE:
+			aNode = (node) args[0];
+			aPop = (population) args[1];
+			aPop2 = (population) args[2];
+			outFile.write(String.format("%f\tM\t%d %d %d\n",gen,aNode.getName(),aPop.getPopName(),aPop2.getPopName()));
 			outFile.close();
 			break;
 		case RECOMBINE:

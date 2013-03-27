@@ -1,9 +1,6 @@
 package cosiRand;
 
-import java.lang.management.ManagementFactory;
 import java.security.SecureRandom;
-import java.util.Date;
-import java.util.Random;
 
 
 public class randomNum{
@@ -36,7 +33,7 @@ SecureRandom generator;
 public  double randomDouble(){
 	
 	return ran2(randseed);
-	//return generator.nextDouble(;
+	//return generator.nextDouble();
 	
 	}
 public  void setRngSeed(long rseed){
@@ -53,6 +50,7 @@ public  void seedRandom(){
 	long newSeed;
 	newSeed = generator.nextInt();
 	newSeed = Math.abs(newSeed);
+	//newSeed = 102757394;
 	randseed = newSeed;
 	newSeed *= (-1);
 	ran2(newSeed);

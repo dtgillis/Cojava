@@ -68,29 +68,36 @@ public class sim {
 		 *
 		 */
 		public double simExecute() throws InterruptedException{
-			double gen=0,historicalEventTime,poissonEventTime;
-			boolean coal =false;
-			boolean completeFlag = false;
-			while(completeFlag==false){
-				coal = false;
-				historicalEventTime = (double) simGetHistEvent(gen);
-				poissonEventTime = this.simGetPoisEvent();
-				if(DEBUG){
-					System.out.println(String.format("recomb: %f coalesce: %f migrate: %f geneconvert: %f \n",
-							recombRate,coalesceRate,migrateRate,geneConvRate));
-					System.out.println(String.format("poisson time: %f, hist time: %f",poissonEventTime,historicalEventTime));
-				}
-				if(historicalEventTime < 0 || poissonEventTime < historicalEventTime){
-					gen += poissonEventTime;
-					coal = simDoPoisson(gen);
-					if(coal){completeFlag = dem.doneCoalescent2();}
-				}
-				else{
-					gen += historicalEventTime;
-					gen = histFactory.historicalEventExecute(gen);
-					completeFlag = dem.doneCoalescent2();
-				}
-				
+			double gen = 0;
+			double historical_event_time;
+			double  poisson_event_time;	
+			boolean coal = false;
+			boolean complete_flag = false;	
+
+			while (!complete_flag) {
+			  coal = false;
+			  historical_event_time = (double) simGetHistEvent(gen);
+			  poisson_event_time = simGetPoisEvent();
+			  
+			  if (DEBUG) {
+			    System.out.print(String.format("recomb: %f coalesce: %f migrate: %f geneconvert: %f\n", 
+				   recombRate, coalesceRate, migrateRate, geneConvRate));
+			    System.out.print(String.format("poisson time: %f, hist time: %f\n", 
+				   poisson_event_time, historical_event_time));
+			  }
+			  
+			  if (historical_event_time < 0 
+			      || poisson_event_time < historical_event_time) {
+			    gen += poisson_event_time;
+			    coal = simDoPoisson (gen);
+			    if (coal) {complete_flag = dem.doneCoalescent2();}
+			  }
+			  else {
+			    gen += historical_event_time;
+			    gen = histFactory.historicalEventExecute(gen);
+			    complete_flag = dem.doneCoalescent2(); 
+			  }
+
 			}
 			return gen;
 			

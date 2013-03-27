@@ -4,19 +4,14 @@ import geneConversion.gc;
 import historical.histWorker;
 
 import java.io.BufferedReader;
-import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
-import java.util.regex.Pattern;
-
-import cosiRand.randomNum;
 
 import recomb.recListMaker;
 import simulator.sim;
-
 import coalescent.ArgHandler;
-import coalescent.CoalescentMain;
+import cosiRand.randomNum;
 import demography.demography;
 public class fileReader {
 	ArgHandler fileSet;

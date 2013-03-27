@@ -38,6 +38,7 @@ public class population {
 		return members;
 	}
 	public node getNode(int index){
+		//index = members.getNumMembers() - index -1;
 		return members.getNode(index);
 	}
 	public int getPopName(){

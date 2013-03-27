@@ -59,8 +59,10 @@ public class CoalescentMain {
 		mutate = new mutations(dem,segFactory);
 		recomb = new recListMaker(dem, random);
 		geneConversion = new gc(dem, random);
-		migFactory = new migrationWorker(dem);
+		migFactory = new migrationWorker(dem,random);
 		bottleneck = new bottleNeck(dem,poissoner);
+		sweeper = new sweep(dem, recomb, geneConversion, random, poissoner, nodeFactory, segFactory);
+
 		histFactory = new histWorker(dem, migFactory, sweeper, bottleneck);
 		coalesce = new coalesce(dem, random);
 		simulator = new sim(dem, poissoner, geneConversion, recomb, random, histFactory, coalesce, migFactory, mutate);
@@ -68,7 +70,7 @@ public class CoalescentMain {
 		//now assign all the  info in our paramater file....
 		inputHandler = new fileReader(fileHolder, dem, recomb, simulator, geneConversion, histFactory, random);
 		inputHandler.paramFileProcess();
-		sweeper = new sweep(dem, recomb, geneConversion, random, poissoner, nodeFactory, segFactory);
+		//sweeper = new sweep(dem, recomb, geneConversion, random, poissoner, nodeFactory, segFactory);
 		aMutList = new mutList();//mutlist init
 		hapFactory = new hapWorker(haps, dem);
 		hapFactory.hapAssignChroms();

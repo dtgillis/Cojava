@@ -282,42 +282,4 @@ public class histWorker {
 		if(currentEvent == null) return -1;
 		else return currentEvent.getGen() - gen;
 	}
-	private String[] parsePopEventString(String aString){
-		String[] tempArr = new String[10];
-		int i = 0,k=0;
-		int temp1 = 0,temp2=0;
-		
-		while(i<aString.length()){
-			//if(aString.charAt(i)!=' ' || aString.charAt(i)!='"')i++;
-				
-			 if(aString.charAt(i)==' '){
-				i++;
-				temp1 = i;
-				i++;
-				while(aString.charAt(i)!=' '&& i<aString.length()){
-					i++;
-				}
-				temp2 = i;
-				i++;
-			}
-			else if(aString.charAt(i)=='"'){
-				i++;
-				temp1 = i;
-				
-				while(aString.charAt(i)!='"'){
-					i ++;
-				}
-				temp2 = i;
-				i++;
-			}
-			else{ i++; temp1 = 0; temp2 =0;} 
-
-			//else i++;
-			if(temp1!=0 && temp2!=0){
-			tempArr[k] = aString.substring(temp1, temp2).trim();
-			k++;
-			}
-		}
-		return tempArr;
-	}
 }

@@ -13,19 +13,21 @@ public class coalesce {
 		dem = adem;
 	}
 	public double coalesceGetRate(){
-		int numPops = dem.getNumPops();
+		int numpops = dem.getNumPops();
+		int i;
 		double rate = 0;
-		int numNodes,popSize;
+		int numnodes;
+		int popsize;
 		
-		for(int i=0;i<numPops;i++){
-			numNodes = dem.getNumNodesInPopByIndex(i);
-			popSize = dem.getPopSizeByIndex(i);
-			if(numNodes>1){
-				rate+=(double)(numNodes*(numNodes-1))/(4 * popSize);
-			}
-			
+		for (i = 0; i < numpops; i++) {
+			numnodes = dem.getNumNodesInPopByIndex(i);
+			popsize = dem.getPopSizeByIndex(i);
+			if (numnodes > 1)
+				rate += (double) (numnodes * (numnodes - 1)) 
+					/ (4 * popsize);
 		}
-		setLastRate(rate);
+		
+		lastRate = rate;
 		return rate;
 	}
 	public void setLastRate(double rate) {
@@ -36,21 +38,26 @@ public class coalesce {
 		return lastRate;
 	}
 	public int coalescePickPopIndex(){
-		double rate = 0;
-		double randCounter = random.randomDouble();
-		int i,popIndex,numPops,numNodes,popSize;
-		popIndex = 0;
-		numPops = dem.getNumPops();
-		if(numPops>1){
-			for( i=0;i<numPops&&randCounter > rate; i++){
-				numNodes = dem.getNumNodesInPopByIndex(i);
-				popSize = dem.getPopSizeByIndex(i);
-				if(numNodes>1)
-					rate += (double)(numNodes * (numNodes -1))/(4*popSize);
-			}
-			popIndex = i-1; 
+
+		double  rate = 0,
+			randcounter = random.randomDouble() * lastRate;
+		int     popindex = 0,
+			numpops = dem.getNumPops(),
+			numnodes,
+			popsize,
+			i;
+		
+		if (numpops > 1) {
+			for (i = 0; i < numpops && randcounter > rate; i++) {
+				numnodes = dem.getNumNodesInPopByIndex(i);
+				popsize = dem.getPopSizeByIndex(i);
+				if (numnodes > 1)
+					rate += (double) (numnodes * (numnodes - 1)) 
+						/ (4 * popsize);
+			}		
+			popindex = i - 1;
 		}
-		return popIndex;
+		return popindex;
 		
 	}
 	

@@ -1,8 +1,5 @@
 package haplos;
 
-import java.util.ArrayList;
-
-import coalescent.CoalescentMain;
 import demography.demography;
 import pop.population;
 

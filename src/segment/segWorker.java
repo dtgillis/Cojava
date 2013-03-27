@@ -50,130 +50,164 @@ public class segWorker {
 	  newseg.next = null;
 	  return headseg;
 	}
-	public seg segUnion(seg seg1, seg seg2){
-		double begin,end;
-		seg activeSeg,nextSeg,tempSeg,newSeg;
-		newSeg = null;
-		if (seg1 != null && seg2 != null){
+	public seg segUnion(seg segptr1, seg segptr2) 
+	{
+		  seg activesegptr = null, nextsegptr = null, tempptr;
+		  double begin = 0, end = 0;
+		  seg newptr;
 			
-			if(seg1.begin<seg2.begin){
-				begin = seg1.begin;
-				end = seg1.end;
-				nextSeg = seg1.next;
-				activeSeg = seg2;
-			}
-			else{
-				begin = seg2.begin;
-				end = seg2.end;
-				nextSeg = seg2.next;
-				activeSeg = seg1;
-			}
-			if(nextSeg !=null && (activeSeg.begin > nextSeg.begin)){
-				tempSeg = nextSeg;
-				nextSeg = activeSeg;
-				activeSeg = tempSeg;
-			}
+		  newptr = null;
 		
-		}
-		else{
-			System.out.println("segUnion: you did something wrong - null segment");
-			System.exit(0);
-			return null;
-		}
-		// updating begin/end using activeSeg
-		if(activeSeg.begin > end){
-			newSeg = segAdd(newSeg,begin,end);
-			begin = activeSeg.begin;
-			end = activeSeg.end;
-		}
-		else if (activeSeg.end > end){
-			end = activeSeg.end;
-		}
-		while (activeSeg.getNext()!=null && nextSeg!=null){
-			if(activeSeg.getNext().getBegin() > nextSeg.getBegin()){
-				tempSeg = nextSeg;
-				nextSeg = activeSeg.getNext();
-				activeSeg = tempSeg;
-			}
-			else{
-				activeSeg = activeSeg.getNext();
-			}
-			//iff possible segment is disjoint add this segment and startover
-			if(activeSeg.getBegin()>end){
-				newSeg = this.segAdd(newSeg, begin, end);
-				begin = activeSeg.getBegin();
-				end = activeSeg.getEnd();
-			}
-			else if(activeSeg.getEnd()>end){
-				end = activeSeg.getEnd();
-			}
-			
-		}
-		//now either activeSeg.next is null or nextSeg is null
-		if(nextSeg != null){
-			activeSeg = nextSeg;
-		}
-		else activeSeg = activeSeg.next;
-		
-		while(activeSeg!= null ){
-			//first check if activeSeg.next overlaps the current begin/end
-			//then copy all of activeSeg to newSeg
-			if(activeSeg.begin > end){
-				newSeg = segAdd(newSeg,begin,end);
-				begin = activeSeg.begin;
-				end = activeSeg.end;
-			}
-			else if (activeSeg.end > end){
-				end = activeSeg.end;
-			}
-			activeSeg = activeSeg.next;
-		}
-		newSeg = segAdd(newSeg,begin,end);
-		
-		return newSeg;
-	}
-	public seg segIntersect(seg seg1,seg seg2){
-		seg newSeg = null;
-		double begin,end;
-		seg firstSeg,secondSeg,tempSeg;
-		if(seg1 ==null || seg2 == null){
-			System.out.println("Stop! something is wrong in segIntersect");
-		}
-		if(seg1.begin < seg2.begin){
-			firstSeg = seg1;
-			secondSeg = seg2;
-		}
-		else{
-			firstSeg = seg2;
-			secondSeg = seg1;
-		}
-		
-		while(firstSeg !=null && secondSeg !=null){
-			//which segment is first?
-			if(firstSeg.begin > secondSeg.begin){
-				tempSeg = firstSeg;
-				firstSeg = secondSeg;
-				secondSeg = tempSeg;
-			}
-			//if they overlap
-			
-			if(firstSeg.end>secondSeg.begin){
-				begin = secondSeg.begin;
+		  if (segptr1 != null && segptr2 != null) {
 				
-				//if second is contained completely in the first
-				if(firstSeg.end > secondSeg.end){
-					end = secondSeg.end;
-					secondSeg = secondSeg.next;
-				}
-				else{
-					end = firstSeg.end;
-					firstSeg = firstSeg.next;
-				}
-				newSeg = segAdd(newSeg,begin,end);
-			}
-			else firstSeg = firstSeg.next;
-		}
-		return newSeg;
+		    if (segptr1.begin < segptr2.begin) {
+		      begin = segptr1.begin;
+		      end = segptr1.end;
+		      nextsegptr = segptr1.next;
+		      activesegptr = segptr2;
+		    }
+		    else { 
+		      begin = segptr2.begin;
+		      end = segptr2.end;
+		      nextsegptr = segptr2.next;
+		      activesegptr = segptr1;
+		    }
+				
+		    if (nextsegptr != null && (activesegptr.begin > nextsegptr.begin)) {
+		      tempptr = nextsegptr;
+		      nextsegptr = activesegptr;
+		      activesegptr = tempptr;
+		    }
+		  }
+		  else {
+		    System.out.println("segment_union: you did something wrong - null segment.\n");
+		    System.exit(0);
+		    /*    if one or the other is null 
+			  this has got to be impossible. */
+		  }
+		  
+		  /* updating begin/end using activesegptr */
+		  if (activesegptr.begin > end) {
+		    newptr = segAdd(newptr, begin, end);
+		    begin = activesegptr.begin;
+		    end = activesegptr.end;    
+		  } 
+		  else if (activesegptr.end > end) {
+		    end = activesegptr.end;
+		  }
+			
+			
+		  /* choosing between activesegptr->next and nextsegptr */
+		  while (activesegptr.next != null && nextsegptr != null) {
+				
+		    if (activesegptr.next.begin > nextsegptr.begin) {
+		      tempptr = nextsegptr;
+		      nextsegptr = activesegptr.next;
+		      activesegptr = tempptr;
+		    }
+		    else {
+		      activesegptr = activesegptr.next;
+		    }
+				
+		    /* if next possible segment is disjoint, add this segment, and startover. */
+		    if (activesegptr.begin > end) {
+		      newptr = segAdd(newptr, begin, end);
+		      begin = activesegptr.begin;
+		      end = activesegptr.end;    
+		    } 
+		    else if (activesegptr.end > end) {
+		      end = activesegptr.end;
+		    }
+		  }
+			
+		  /* when we reach this point, either activesegptr->next is null or nextsegptr is null. */
+			
+		  if (nextsegptr != null) {
+		    activesegptr = nextsegptr;
+				
+		  }
+		  
+		  /* end */
+		  else {
+		    activesegptr = activesegptr.next;
+		  }  
+		  
+		  while (activesegptr != null) {
+		    /* first check if activesegptr->next overlaps the current begin/end
+		       then copy all of activesegptr to new segment */
+		    
+		    if (activesegptr.begin > end) {
+		      newptr = 
+			segAdd(newptr, begin, end);
+		      begin = activesegptr.begin;
+		      end = activesegptr.end;
+		    }
+			  
+		    else if (activesegptr.end > end) {
+		      end = activesegptr.end;
+		    }
+
+		    activesegptr = activesegptr.next;
+		  
+		    /*end */
+		  }
+		  newptr = segAdd(newptr, begin, end);
+
+		  
+		  return newptr;
+	}
+
+	public seg segIntersect(seg segptr1,seg segptr2){
+		seg newsegptr = null;
+		  double begin, end;
+
+		  seg firstseg, secondseg, tempseg;
+
+		  if (segptr1 == null || segptr2 == null) {
+		    System.out.println("stop! you did something wrong. null seg in seg intersect\n");
+		  }
+
+		  if (segptr1.begin < segptr2.begin) {
+		    firstseg = segptr1;
+		    secondseg = segptr2;
+		  }
+		  else {
+		    firstseg = segptr2;
+		    secondseg = segptr1;
+		  }
+
+		  while (firstseg != null && secondseg != null) {
+		    /* which is first, first or 2nd? */
+		    if (firstseg.begin > secondseg.begin) {
+		      tempseg = firstseg;
+		      firstseg = secondseg;
+		      secondseg = tempseg;
+		    }
+				
+
+		    /* if they overlap: */
+		    if (firstseg.end > secondseg.begin) {
+		      begin = secondseg.begin;
+					
+		      /* if second is wholly contained in first */
+		      if (firstseg.end > secondseg.end) {
+			end = secondseg.end;
+			secondseg = secondseg.next;
+		      }
+					
+		      else {
+			end = firstseg.end;
+			firstseg = firstseg.next;
+		      }
+					
+		      newsegptr = segAdd(newsegptr, begin, end);
+		    }
+		    else {
+		      firstseg = firstseg.next;
+		    }
+		  }
+
+		  return newsegptr;
 	}
 	public seg segAdd(seg curSeg, double begin, double end) {
 		seg newSeg = new seg(0,0);
