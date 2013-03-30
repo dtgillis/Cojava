@@ -57,8 +57,9 @@ public class mutations {
 		aMut = mutateRegion(aNode,loc,treeTime,randMark);
 		if(MUTATE_DEBUG){
 			System.out.println("mark: " + randMark);
-			mutatePrint(aFile,aMut,aMutList,aHap);
 		}
+			mutatePrint(aFile,aMut,aMutList,aHap);
+		
 	}
 	public void mutatePrintHeaders(File aFile){
 		String out = " pos \t anc1 anc2 \tfreq \tnodes...\n";

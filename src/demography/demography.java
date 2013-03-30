@@ -602,16 +602,6 @@ public class demography {
 				
 				completePop.addNode(tempnodeptr);
 				popptr.removeNode(tempnodeptr);
-				if (DEMOG_DEBUG) {
-					//fprintf(stdout, 
-						//"the following %d nodes are left:\n", 
-						//completepop->members.nummembers);
-					//for (i = 0; 
-					  //   i < demography_data.completepop->members.nummembers; i++)
-						//print_node(pop_get_node 
-							//   (i, 
-							  //  &(demography_data.completepop->members)));
-				}  
 				return true;
 			}
 
@@ -780,7 +770,7 @@ public class demography {
 				if(outPutFile !=null){
 				out = "" + gen + "\tD\t" + aNode.getName() + " -> " + aNode3.getName() + " | " + aNode2.getName() + " " + aNode2.getSegment().getBegin() + " " + aNode2.getSegment().getEnd() + "\n";
 				//write to file
-				System.out.println(out);
+				//System.out.println(out);
 				outFile.write(out);
 				outFile.close();
 				break;

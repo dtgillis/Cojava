@@ -70,7 +70,7 @@ public class out {
 				nchr = 0;
 				for(ichr =0;ichr<haplos.getNChrom();ichr++){
 					if(haplos.getWhichPopInd()[ichr]!=ipop){continue;}
-					//outWriter.write(String.format("%d\t%d\t",ichr,haplos.getPopId()[ipop]));
+					outWriter.write(String.format("%d\t%d\t",ichr,haplos.getPopId()[ipop]));
 					for(im=0;im<aMutList.getNMut();im++){aHap[im] = 2;}
 					for(i=0;i<haplos.getnMut()[ichr];i++){
 						aHap[haplos.getMutIndex()[ichr][i]] = 1;
@@ -78,7 +78,7 @@ public class out {
 					}
 					for(im=0;im<aMutList.getNMut();im++){
 						if(useMut[mutSort[im]]==1){
-							outWriter.write(String.format(" %d ",aHap[mutSort[im]]));
+							outWriter.write(String.format("%d ",aHap[mutSort[im]]));
 						}
 					}
 					outWriter.write("\n");
