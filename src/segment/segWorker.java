@@ -7,48 +7,47 @@ public class segWorker {
 	}
 	public seg segInverse (seg segptr) 
 	{
-	  seg newseg, newseg2;
-	  seg oldseg, headseg;
-	  boolean setend = true;
+		seg newseg, newseg2;
+		  seg oldseg, headseg;
+		  boolean setend = true;
 
-	  if (segptr == null) 
-	    return new seg(0,1);
+		  if (segptr == null) 
+		    return new seg(0,1);
 
-	  headseg = new seg(0,0);
-	  
-	  newseg = headseg;
+		  headseg = new seg(0,0);
+		  newseg = headseg;
 
-	  oldseg = segptr;
+		  oldseg = segptr;
 
-	  if (oldseg.begin > 0)
-	    newseg.begin = 0;
-	  else {
-	    newseg.begin = oldseg.end;
-	    oldseg = oldseg.next;
-	  }
+		  if (oldseg.begin > 0)
+		    newseg.begin = 0;
+		  else {
+		    newseg.begin = oldseg.end;
+		    oldseg = oldseg.next;
+		  }
 
-	  while (oldseg != null) {
-	    newseg.end = oldseg.begin;
-	    if (oldseg.end != 1) {
-				
-	      newseg2 = new seg(0,0);
-	      newseg.next = newseg2;
-	      newseg = newseg2;
-	      newseg.begin = oldseg.end;
-	      oldseg = oldseg.next;
-	    }
-	    else {
-	      setend = false;
-	      oldseg = oldseg.next;
-	    }
-	  }
-	       
-	  if(setend)
-	    newseg.end = 1;
+		  while (oldseg != null) {
+		    newseg.end = oldseg.begin;
+		    if (oldseg.end != 1) {
+					
+		      newseg2 = new seg(0,0);
+		      newseg.next = newseg2;
+		      newseg = newseg2;
+		      newseg.begin = oldseg.end;
+		      oldseg = oldseg.next;
+		    }
+		    else {
+		      setend = false;
+		      oldseg = oldseg.next;
+		    }
+		  }
+		       
+		  if (setend)
+		    newseg.end = 1;
 
 
-	  newseg.next = null;
-	  return headseg;
+		  newseg.next = null;
+		  return headseg;
 	}
 	public seg segUnion(seg segptr1, seg segptr2) 
 	{
@@ -191,13 +190,13 @@ public class segWorker {
 					
 		      /* if second is wholly contained in first */
 		      if (firstseg.end > secondseg.end) {
-			end = secondseg.end;
-			secondseg = secondseg.next;
+		    	  end = secondseg.end;
+		    	  secondseg = secondseg.next;
 		      }
 					
 		      else {
-			end = firstseg.end;
-			firstseg = firstseg.next;
+		    	  end = firstseg.end;
+		    	  firstseg = firstseg.next;
 		      }
 					
 		      newsegptr = segAdd(newsegptr, begin, end);
@@ -209,25 +208,30 @@ public class segWorker {
 
 		  return newsegptr;
 	}
-	public seg segAdd(seg curSeg, double begin, double end) {
-		seg newSeg = new seg(0,0);
-		if(curSeg == null){
-			newSeg.begin = begin;
-			newSeg.end = end;
-			newSeg.next = curSeg;
-			return newSeg;
-		}
-		else if(curSeg.begin > begin){
-			newSeg.begin = begin;
-			newSeg.end = end;
-			newSeg.next = curSeg;
-			return newSeg;
-		}
-		else{
-			curSeg.next = segAdd(curSeg.next,begin,end);
-			return curSeg;
-		}
-		
+	public seg segAdd(seg ptr, double begin, double end) {
+		  seg newptr = new seg(0,0);
+			
+			
+		  if (ptr == null) {
+		    	
+		    newptr.begin = begin;
+		    newptr.end = end;
+		    newptr.next = ptr;
+		    return newptr;
+		  }
+			
+		  else if (ptr.begin > begin) {
+		    	
+		    newptr.begin = begin;
+		    newptr.end = end;
+		    newptr.next = ptr;
+		    return newptr;
+		  }
+			
+		  else {
+		    ptr.next = segAdd(ptr.next, begin, end);
+		    return ptr;
+		  }
 	}
 	public boolean segContains(seg aSeg,double loc){
 		while (aSeg != null){

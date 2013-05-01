@@ -18,7 +18,7 @@ public class mutations {
 	double location;
 	node ancNode1,ancNode2;
 	mutNodeList mutNodes;
-	boolean MUTATE_DEBUG = true;
+	boolean MUTATE_DEBUG = false;
 	demography dem;
 	segWorker segFactory;
 	public mutations(demography adem,segWorker aSegWorker){

@@ -31,10 +31,7 @@ SecureRandom generator;
 	 generator = new SecureRandom();
  }
 public  double randomDouble(){
-	
 	return ran2(randseed);
-	//return generator.nextDouble();
-	
 	}
 public  void setRngSeed(long rseed){
 	randseed = rseed;

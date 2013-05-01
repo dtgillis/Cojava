@@ -55,7 +55,8 @@ public class CoalescentMain {
 		poissoner = new poisson(random);
 		nodeFactory = new nodeWorker(segFactory);
 		dem = new demography(nodeFactory,segFactory,random);
-		dem.setLogFile(fileHolder.getLogFile());
+		if(fileHolder.logFileSet)dem.setLogFile(fileHolder.getLogFile());
+		
 		mutate = new mutations(dem,segFactory);
 		recomb = new recListMaker(dem, random);
 		geneConversion = new gc(dem, random);

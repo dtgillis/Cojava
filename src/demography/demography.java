@@ -31,7 +31,8 @@ public class demography {
 	final int MIG_RATE = 9; 
 	final int HISTORICAL = 10;
 	final int GENE_CONVERSION = 12;
-	final boolean DEMOG_DEBUG = true;
+	final boolean DEMOG_DEBUG = false;
+	boolean logFileSet = false;
 	ranBinom randBinom;
 	randomNum random;
 	public demography(nodeWorker aNodeFactory,segWorker aSegFactory,randomNum aRNG){//dg_initialize()
@@ -53,6 +54,7 @@ public class demography {
 	}
 	public void setLogFile(File aFile){
 		logFile = aFile;
+		logFileSet = true;
 	}
 	public File getLogFile(){
 		return logFile;
@@ -315,33 +317,36 @@ public class demography {
 		    contains = false;
 		    while (tseg != null) {
 		      if (loc >= tseg.getBegin()) {
-			if (loc <= tseg.getEnd()) {
-			  contains = true;
-			  break;
-			}
-			tseg = tseg.getNext();
+		    	  if (loc <= tseg.getEnd()) {
+		    		  contains = true;
+		    		  break;
+		    	  }
+		    	  
+		    	  tseg = tseg.getNext();
 		      }
 		      else { 
-			contains = false;
-			break;
+		    	  contains = false;
+		    	  break;
 		      }
 		    }
+		    
 		    if (contains) {
 		      nodesatloc++;
 		    }
 		    tseg = node2.getSegment();
 		    contains = false;
 		    while (tseg != null) {
-		      if (loc >= tseg.getBegin()) {
-			if (loc <= tseg.getEnd()) {
-			  contains = true;
-			  break;
-			}
-			tseg = tseg.getNext();
+		    	if (loc >= tseg.getBegin()) {
+		    		if (loc <= tseg.getEnd()) {
+		    			contains = true;
+		    			break;
+		    		}
+		    		
+		    		tseg = tseg.getNext();
 		      }
 		      else { 
-			contains = false;
-			break;
+		    	  contains = false;
+		    	  break;
 		      }
 		    }
 		    if (contains) {
@@ -505,7 +510,7 @@ public class demography {
 	public int getNumNodes(){//dg_get_num_nodes
 		int total = 0;
 		for(int i = 0; i<numPops; i++)
-			{total += getNumNodesInPopByIndex(i);}//should be plus = ?
+			{total = getNumNodesInPopByIndex(i);}//should be plus = ?
 		return total;
 	}
 	public int getNumNodesInPopByIndex(int popIndex){
@@ -562,29 +567,29 @@ public class demography {
 			    if (sitetemp.getNNode() == 1) {
 			      loc = (sitetemp.getSite() + sitetemp.getNext().getSite()) / 2;
 			      for (i = 0; i < popptr.getMembers().getNumMembers(); i++) {
-				/* Unoptimized:*/
-				 nodeptr = popptr.getNode(i);
-				/* Optimized, but fragile: */
-				//nodeptr = popptr.getMembers().getNode(popptr.getMembers().getNumMembers() - i - 1); 
-				/* Start hardwired optimization (from seg_contains(), segment.c) */
-				tseg = nodeptr.getSegment();
-				contains = false;
-				while (tseg != null) {
-				  if (loc >= tseg.getBegin()) {
-				    if (loc <= tseg.getEnd()) {
-				      contains = true;
-				      tempnodeptr = nodeptr;
-				      break;
-				    }
-				    tseg = tseg.getNext();
-				  }
-				  else { 
-				    contains = false;
-				    break;
-				  }
-				}
-				/* end optimization */
-				assert(contains = true);
+			    	  /* Unoptimized:*/
+			    	  nodeptr = popptr.getNode(i);
+			    	  /* Optimized, but fragile: */
+			    	  //nodeptr = popptr.getMembers().getNode(popptr.getMembers().getNumMembers() - i - 1); 
+			    	  /* Start hardwired optimization (from seg_contains(), segment.c) */
+			    	  tseg = nodeptr.getSegment();
+			    	  contains = false;
+			    	  while (tseg != null) {
+			    		  if (loc >= tseg.getBegin()) {
+			    			  if (loc <= tseg.getEnd()) {
+			    				  contains = true;
+			    				  tempnodeptr = nodeptr;
+			    				  break;
+			    			  }
+			    			  tseg = tseg.getNext();
+			    		  }
+			    		  else { 
+			    			  contains = false;
+			    			  break;
+			    		  }
+			    	  }
+			    	  /* end optimization */
+			    	  assert(contains = true);
 			      }
 			      this.addToCompletePopulation(tempnodeptr, 
 						     popptr, 
@@ -705,6 +710,7 @@ public class demography {
 	 * demography.c.
 	 */
 	public void dgLog (int type,double gen, Object ... args){
+		if(!logFileSet) return;
 		File outPutFile = logFile;
 		population aPop,aPop2;
 		node aNode,aNode2,aNode3;
@@ -876,7 +882,7 @@ public class demography {
 	 *  perhaps this can be used later to modify mutation rates on different
 	 *  parts of the chromosome.
 	 */
-	public double getRegLength(int rindex1){
+	public double getRegLength(int rindex1){//regLength should possible be an array.
 		int i = 0;
 		siteList tempSites = recombSites;
 		if(rindex1> numSites){

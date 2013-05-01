@@ -76,19 +76,24 @@ public class recListMaker {
 	}
 	
 	public void recomb_calc_r(){
-		double rr = 0;
-		recombStructure tempRecomb = recombs;
-		while(tempRecomb!=null && tempRecomb.startBase < length){
-			if(tempRecomb.next == null || tempRecomb.next.startBase > length)
-				rr += (length - tempRecomb.startBase)*tempRecomb.rate;
-			else
-				rr += (tempRecomb.next.startBase - tempRecomb.startBase) * tempRecomb.rate;
-			
-			tempRecomb.setCumulative(rr);
-			tempRecomb = tempRecomb.next;
-		}
-		
-		recombRate = rr;
+		 double rr = 0;
+		  recombStructure temprecomb = recombs;
+
+		  while (temprecomb != null && temprecomb.startBase < length) {
+		    if (temprecomb.next == null || 
+			temprecomb.next.startBase > length) {
+		      rr += (length - temprecomb.startBase) * 
+			temprecomb.rate;
+		    }
+		    else
+		      rr += (temprecomb.next.startBase - 
+			     temprecomb.startBase) * temprecomb.rate;
+				
+		    temprecomb.setCumulative(rr);
+		    temprecomb = temprecomb.next;
+
+		  }
+		  recombRate = rr;
 	}
 	public double recombGetR(){
 		return recombRate;

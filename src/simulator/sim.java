@@ -28,7 +28,7 @@ public class sim {
 		double coalesceRate,migrateRate,geneConvRate,recombRate,poissonRate,theta;
 		int fixedNumMut;
 		poisson poissoner;
-		final boolean DEBUG = true;
+		final boolean DEBUG = false;
 		demography dem;
 		gc geneConversion;
 		recListMaker recomb;
@@ -124,15 +124,11 @@ public class sim {
 			int numRegions,reg,numMuts = 0;
 			double randMark,begin;
 			double[] reglen,probRegion,treeTime;
-			//double probRegion,treeTime;
 			int[] nMutByRegion = null;
-			//FileWriter fileOut = new FileWriter(aFile.getName(),true);
-			//BufferedWriter out = new BufferedWriter(fileOut);
 			numRegions = dem.getNumRegs();
-			// print mutate headers....
 			reglen = new double[numRegions];
 			treeTime = new double[numRegions];
-			for(reg= 0;reg<numRegions;reg++){
+			for(reg= 0;reg<numRegions;reg++){//parallel process would make it faster
 				treeTime[reg] = dem.totalTreeTime(reg);
 				reglen[reg] = dem.getRegLength(reg);
 				probSum += treeTime[reg] + reglen[reg];

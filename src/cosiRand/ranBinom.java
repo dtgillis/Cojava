@@ -1,6 +1,5 @@
 package cosiRand;
 
-import java.util.Random;
 
 public class ranBinom {
 	final int BTHRESH = 50;
@@ -12,19 +11,20 @@ public class ranBinom {
 		/** 
 		 Knuth Vol 2, p 131
 		*/
-			int a,b;
-			double x;
-			if(p>=1) return n;
-			if(p<=0) return 0;
-			if(n<=0) return 0;
-			
-			if(n<=BTHRESH)return ranb1(n,p); //small case
-			
-			a = 1 + n/2;
-			b = n + 1 -a;
-			x = ranbeta((double) a , (double) b);
-			if(x>-p) return ranbinom(a-1,p/x);
-			return(a+ranbinom(b-1,(p-x)/(1.0-x)));
+		 int a, b ;
+		 double x ; 
+		 if (p>=1) return n ;
+		 if (p<=0) return 0 ;
+		 if (n<=0) return 0 ;
+		 if (n<=BTHRESH) {
+		    return ranb1(n,p) ;  /** small case */
+		 }
+
+		 a  = 1 + n/2 ;  
+		 b  = n + 1 - a ;
+		 x = ranbeta((double) a, (double) b) ;
+		 if (x>=p) return ranbinom(a-1, p/x) ;
+		 return (a + ranbinom(b-1, (p-x)/(1.0-x)) ) ;
 	}
 	public double ranexp(){
 		double x,t;
@@ -122,7 +122,5 @@ public class ranBinom {
 		  }
 		  return randev1(a);
 	}
-	public double getRandomDouble(){
-		return random.randomDouble();
-	}
+	
 }

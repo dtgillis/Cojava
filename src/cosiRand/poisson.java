@@ -52,10 +52,8 @@ public class poisson {
 	}
 	private  double expDev(){
 		double dum = 0;
-			//SecureRandom generator = new SecureRandom();
 		double rand = 	random.randomDouble();
 		dum = (double) 1 - rand;
-		
 		double returner = - Math.log(dum);
 		return returner;
 	}
