@@ -7,3 +7,10 @@
 
 .classpath
 .settings/
+
+#data files #####
+out.hap-*
+out.pos-*
+params
+segs
+recParams

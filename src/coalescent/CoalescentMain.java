@@ -1,6 +1,7 @@
 package coalescent;
 
 import java.io.IOException;
+import java.util.concurrent.ForkJoinPool;
 
 import migration.migrationWorker;
 import mutate.mutList;
@@ -43,11 +44,13 @@ public class CoalescentMain {
 	static segWorker segFactory;
 	static bottleNeck bottleneck;
 	static poisson poissoner;
+	public static ForkJoinPool pool;
 	public static void main(String[] args) throws InterruptedException {
 		// get and process arguments
 		fileHolder = new ArgHandler(args);
 		fileHolder.setArguments();
-		
+		// fork join pool for parallel stuff
+		pool = new ForkJoinPool();
 		// instantiate all the objects that build on each other
 		segFactory = new segWorker();
 		random = new randomNum();

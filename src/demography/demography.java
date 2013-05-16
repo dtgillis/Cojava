@@ -3,6 +3,8 @@ package demography;
 import java.io.File;
 import java.io.FileWriter;
 
+import coalescent.CoalescentMain;
+
 import cosiRand.ranBinom;
 import cosiRand.randomNum;
 
@@ -1042,10 +1044,14 @@ public class demography {
 	public double  totalTreeTime(int rindex1){
 		double point = this.regCenter(rindex1);
 		node tempNode = this.getHeadNode(rindex1);
-		double totalTime = 0;
-		totalTime += this.calcTimeInBranch(point,tempNode.getGen(),tempNode.getDescendents()[0]);
+		//double totalTime = 0;
+		/*totalTime += this.calcTimeInBranch(point,tempNode.getGen(),tempNode.getDescendents()[0]);
 		totalTime += this.calcTimeInBranch(point,tempNode.getGen(),tempNode.getDescendents()[1]);
-		return totalTime;
+		*/
+		TreeTime treeL = new TreeTime(point,tempNode.getGen(),tempNode.getDescendents()[0],segFactory);
+		TreeTime treeR = new TreeTime(point,tempNode.getGen(),tempNode.getDescendents()[1],segFactory);
+		return CoalescentMain.pool.invoke(treeL) + CoalescentMain.pool.invoke(treeR);
+		
 		
 	}
 	public double calcTimeInBranch(double point, double parentTime , node aNode){ 
