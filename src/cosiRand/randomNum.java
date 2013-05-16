@@ -40,14 +40,12 @@ public  long getRandSeed(){
 	return randseed;
 }
 public  long seedRNG(){
-	seedRandom();
+	seedRandom(generator.nextInt());
 	return randseed;
 }
-public  void seedRandom(){
-	long newSeed;
-	newSeed = generator.nextInt();
+public  void seedRandom(long aSeed){
+	long newSeed = aSeed;
 	newSeed = Math.abs(newSeed);
-	//newSeed = 102757394;
 	randseed = newSeed;
 	newSeed *= (-1);
 	ran2(newSeed);

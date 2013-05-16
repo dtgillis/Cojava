@@ -62,6 +62,7 @@ public class fileReader {
 		if(!seeded){
 			System.out.println(String.format("coalescent seed: %d\n", -1 * random.seedRNG()));
 		}
+		System.out.println(String.format("coalescent seed: %d",random.getRandSeed()));
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			System.out.println("Error paramFileProcess" + e.getMessage() );
@@ -147,8 +148,8 @@ public class fileReader {
 			args = cleanString(line);
 			if(Double.parseDouble(args[1])>0){
 				long rseed = -1*Long.parseLong(args[1]);
-				random.setRngSeed(rseed);
-				
+				random.seedRandom(rseed);
+				seeded = true;
 			}
 		}
 		else {

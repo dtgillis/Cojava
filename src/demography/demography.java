@@ -1054,7 +1054,7 @@ public class demography {
 		
 		
 	}
-	public double calcTimeInBranch(double point, double parentTime , node aNode){ 
+	double calcTimeInBranch(double point, double parentTime , node aNode){ 
 		double time;
 		if(aNode == null)
 			return 0;
