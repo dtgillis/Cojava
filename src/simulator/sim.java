@@ -130,10 +130,10 @@ public class sim {
 			reglen = new double[numRegions];
 			//double[] regTest = dem.getRegLengthArray();
 			treeTime = new double[numRegions];
-			reglen = dem.getRegLengthArray();
+//			reglen = dem.getRegLengthArray();
 			for(reg= 0;reg<numRegions;reg++){
 				treeTime[reg] = dem.totalTreeTime(reg);//this call is now parallel
-				reglen[reg] = dem.getRegLengthArray()[reg+1] - dem.getRegLengthArray()[reg];
+				reglen[reg] = dem.getRecombArray()[reg+1] - dem.getRecombArray()[reg];
 				probSum += treeTime[reg] + reglen[reg];
 			}
 			if(fixedNumMut>0){
