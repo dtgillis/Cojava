@@ -37,6 +37,7 @@ public class demography {
 	boolean logFileSet = false;
 	ranBinom randBinom;
 	randomNum random;
+	double[] recombArray;
 	public demography(nodeWorker aNodeFactory,segWorker aSegFactory,randomNum aRNG){//dg_initialize()
 		nodeFactory = aNodeFactory;
 		pops = null;
@@ -1054,6 +1055,16 @@ public class demography {
 		
 		
 	}
+	public double[] getRegLengthArray(){
+		double[] regArray = new double[getNumRegs()];
+		siteList tempList = recombSites;
+		int i = 0;
+		while(tempList.getNext()!=null){
+			regArray[i++]=tempList.getNext().getSite() - tempList.getSite();
+			tempList = tempList.getNext();
+		}
+		return regArray;
+	}
 	double calcTimeInBranch(double point, double parentTime , node aNode){ 
 		double time;
 		if(aNode == null)
@@ -1065,6 +1076,21 @@ public class demography {
 		time += calcTimeInBranch(point,aNode.getGen(),aNode.getDescendents()[0]);
 		time += calcTimeInBranch(point,aNode.getGen(),aNode.getDescendents()[1]);
 		return time;
+	}
+	public void setRecombArray(){
+		//only call after the simulation is finished......
+		double[] temp = new double[numSites+1];
+		siteList tempList = recombSites;
+		int i = 0;
+		while(tempList!=null){
+			temp[i++]=tempList.getSite();
+			tempList = tempList.getNext();
+		}
+		recombArray = temp;
+		
+	}
+	public double[] getRecombArray(){
+		return recombArray;
 	}
 	
 }

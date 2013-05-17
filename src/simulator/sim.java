@@ -118,6 +118,7 @@ public class sim {
 		 */
 		
 		public int simMutate(File aFile, mutList aMutList, hap aHap) throws IOException{
+			dem.setRecombArray();
 			int i,summut = 0;
 			double mutrate, probSum = 0;
 			double loc;
@@ -127,10 +128,12 @@ public class sim {
 			int[] nMutByRegion = null;
 			numRegions = dem.getNumRegs();
 			reglen = new double[numRegions];
+			//double[] regTest = dem.getRegLengthArray();
 			treeTime = new double[numRegions];
-			for(reg= 0;reg<numRegions;reg++){//parallel process would make it faster
-				treeTime[reg] = dem.totalTreeTime(reg);
-				reglen[reg] = dem.getRegLength(reg);
+			reglen = dem.getRegLengthArray();
+			for(reg= 0;reg<numRegions;reg++){
+				treeTime[reg] = dem.totalTreeTime(reg);//this call is now parallel
+				reglen[reg] = dem.getRegLengthArray()[reg+1] - dem.getRegLengthArray()[reg];
 				probSum += treeTime[reg] + reglen[reg];
 			}
 			if(fixedNumMut>0){
@@ -144,8 +147,8 @@ public class sim {
 			for(reg=0;reg<numRegions;reg++){
 				FileWriter fileOut = new FileWriter(aFile.getName(),true);
 				BufferedWriter out = new BufferedWriter(fileOut);
-				begin = dem.regBegin(reg);
-				
+				begin = dem.getRecombArray()[reg];
+				//double begin1 = dem.getRecombArray()[reg];
 				if(fixedNumMut==-1){
 					mutrate = theta * treeTime[reg] * reglen[reg];
 					numMuts = poissoner.poission(mutrate);
