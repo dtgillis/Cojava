@@ -238,13 +238,12 @@ public class mutations {
 		aMutList.setNumMut(aMutList.getNumMut() + 1);
 		out = out + "\n";
 		
-		
+		if(aFile!=null){
 		FileWriter fileOut = new FileWriter(aFile.getName(),true);
-			
-		
 		BufferedWriter outwriter = new BufferedWriter(fileOut);
 		outwriter.write(out);
 		outwriter.close();
+		}
 		
 	
 	}

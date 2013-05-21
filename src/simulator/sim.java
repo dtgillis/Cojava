@@ -145,16 +145,21 @@ public class sim {
 				cosiRand.multiNom.multinom(numRegions, fixedNumMut, probRegion, nMutByRegion);
 			}
 			for(reg=0;reg<numRegions;reg++){
+				BufferedWriter out = null;
+				if(aFile!=null){
 				FileWriter fileOut = new FileWriter(aFile.getName(),true);
-				BufferedWriter out = new BufferedWriter(fileOut);
+				out = new BufferedWriter(fileOut);
+				}
+				
 				begin = dem.getRecombArray()[reg];
 				//double begin1 = dem.getRecombArray()[reg];
 				if(fixedNumMut==-1){
 					mutrate = theta * treeTime[reg] * reglen[reg];
 					numMuts = poissoner.poission(mutrate);
+				if(aFile!=null){	
 						out.write(String.format("> [%f,  %f]  time %d E[muts] = %f (%d)\n",
 								begin,reglen[reg],(int)treeTime[reg],mutrate,numMuts));
-				
+				}
 				}
 					
 				else{ 
@@ -166,8 +171,11 @@ public class sim {
 					
 					
 				}
-				out.close();
+				if(out!=null)
+					out.close();
+				
 				summut += numMuts;
+				
 				for(i=0;i<numMuts;i++){
 					loc = begin + random.randomDouble()*reglen[reg];
 					randMark = random.randomDouble();
