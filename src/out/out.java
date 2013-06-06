@@ -46,7 +46,7 @@ public class out {
 		Arrays.sort(tempVal);
 		for(i=0;i<tempVal.length;i++){//
 			double temp = sortVals[i];
-			mutSort[Arrays.binarySearch(tempVal, temp)] = i;
+			mutSort[i]=Arrays.binarySearch(tempVal, temp);
 		}
 		
 		if(!infSites){
