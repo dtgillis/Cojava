@@ -8,6 +8,8 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.concurrent.RecursiveAction;
 
 import pointers.doublePointer;
 import recomb.recListMaker;
@@ -22,6 +24,7 @@ import mutate.mutations;
 
 import coalesce.coalesce;
 import coalescent.CoalescentMain;
+import demography.TreeTime2;
 import demography.demography;
 
 public class sim {
@@ -132,10 +135,12 @@ public class sim {
 			treeTime = new double[numRegions];
 //			reglen = dem.getRegLengthArray();
 			for(reg= 0;reg<numRegions;reg++){
-				treeTime[reg] = dem.totalTreeTime(reg);//this call is now parallel
+				//treeTime[reg] = dem.totalTreeTime(reg);//this call is now parallel
 				reglen[reg] = dem.getRecombArray()[reg+1] - dem.getRecombArray()[reg];
 				probSum += treeTime[reg] + reglen[reg];
 			}
+			
+			CoalescentMain.pool.invoke(new TreeTime2(0,numRegions,treeTime,dem));
 			if(fixedNumMut>0){
 				probRegion = new double[numRegions];
 				nMutByRegion = new int[numRegions];

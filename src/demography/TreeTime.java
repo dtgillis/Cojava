@@ -34,7 +34,7 @@ public class TreeTime extends RecursiveTask<Double> {
 		TreeTime timeL = new TreeTime(point,aNode.getGen(),aNode.getDescendents()[0],segFactory);
 		timeL.fork();
 		TreeTime timeR = new TreeTime(point,aNode.getGen(),aNode.getDescendents()[1],segFactory);
-		return time + timeR.compute() + timeL.join();
+		return time + timeR.invoke() + timeL.join();
 		
 	}
 
