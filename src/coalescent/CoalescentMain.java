@@ -19,6 +19,7 @@ import cosiRand.randomNum;
 import demography.demography;
 import files.fileReader;
 import geneConversion.gc;
+import haplos.Hap2;
 import haplos.hap;
 import haplos.hapWorker;
 import historical.histWorker;
@@ -44,6 +45,7 @@ public class CoalescentMain {
 	static segWorker segFactory;
 	static bottleNeck bottleneck;
 	static poisson poissoner;
+	static Hap2 hapalt;
 	public static ForkJoinPool pool;
 	public static void main(String[] args) throws InterruptedException {
 		// get and process arguments
@@ -74,6 +76,7 @@ public class CoalescentMain {
 		//now assign all the  info in our paramater file....
 		inputHandler = new fileReader(fileHolder, dem, recomb, simulator, geneConversion, histFactory, random);
 		inputHandler.paramFileProcess();
+		hapalt = new Hap2(dem);
 		//sweeper = new sweep(dem, recomb, geneConversion, random, poissoner, nodeFactory, segFactory);
 		aMutList = new mutList();//mutlist init
 		hapFactory = new hapWorker(haps, dem);
