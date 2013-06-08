@@ -58,7 +58,7 @@ public class mutations {
 		if(MUTATE_DEBUG){
 			System.out.println("mark: " + randMark);
 		}
-			mutatePrint(aFile,aMut,aMutList,aHap);
+		mutatePrint(aFile,aMut,aMutList,aHap);
 		
 	}
 	public void mutatePrintHeaders(File aFile){
@@ -67,10 +67,8 @@ public class mutations {
 		
 	}
 	
-	///////////////////////////////////////////////
-	// internal functions
 	
-	mutations mutateRegion(node headNode,double loc,double treeAge,double randMark){
+	public mutations mutateRegion(node headNode,double loc,double treeAge,double randMark){
 		doublePointer ratio = new doublePointer();//already set to 0...
 		mutations newMuts;
 		node mutateNode,tempNode;

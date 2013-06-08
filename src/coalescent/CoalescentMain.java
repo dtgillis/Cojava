@@ -85,7 +85,7 @@ public class CoalescentMain {
 		sweeper.sweepInitMut(aMutList, haps);
 		simulator.simExecute();
 		try {
-			simulator.simMutate(fileHolder.getSegFile(), aMutList, haps);
+			simulator.simMutate(fileHolder.getSegFile(), aMutList, hapalt);
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

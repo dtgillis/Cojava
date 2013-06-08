@@ -1,14 +1,19 @@
 package simulator;
 
 import geneConversion.gc;
+import haplos.Hap2;
 import haplos.hap;
 import historical.histWorker;
+import org.ojalgo.matrix.*;
+import org.ojalgo.matrix.store.PhysicalStore;
+import org.ojalgo.matrix.store.PrimitiveDenseStore;
 
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.concurrent.RecursiveAction;
 
 import pointers.doublePointer;
@@ -120,7 +125,7 @@ public class sim {
 		 *    mutation.
 		 */
 		
-		public int simMutate(File aFile, mutList aMutList, hap aHap) throws IOException{
+		public int simMutate(File aFile, mutList aMutList, Hap2 aHap) throws IOException{
 			dem.setRecombArray();
 			int i,summut = 0;
 			double mutrate, probSum = 0;
@@ -129,6 +134,7 @@ public class sim {
 			double randMark,begin;
 			double[] reglen,probRegion,treeTime;
 			int[] nMutByRegion = null;
+			double[] posSnp; 
 			numRegions = dem.getNumRegs();
 			reglen = new double[numRegions];
 			//double[] regTest = dem.getRegLengthArray();
@@ -141,14 +147,15 @@ public class sim {
 			}
 			
 			CoalescentMain.pool.invoke(new TreeTime2(0,numRegions,treeTime,dem));
-			if(fixedNumMut>0){
+			/*if(fixedNumMut>0){
 				probRegion = new double[numRegions];
 				nMutByRegion = new int[numRegions];
 				for(reg = 0;reg<numRegions;reg++){
 					probRegion[reg] = treeTime[reg]*reglen[reg] /probSum;
 				}
 				cosiRand.multiNom.multinom(numRegions, fixedNumMut, probRegion, nMutByRegion);
-			}
+			}*/
+			nMutByRegion = new int[numRegions];
 			for(reg=0;reg<numRegions;reg++){
 				BufferedWriter out = null;
 				if(aFile!=null){
@@ -156,39 +163,58 @@ public class sim {
 				out = new BufferedWriter(fileOut);
 				}
 				
-				begin = dem.getRecombArray()[reg];
-				//double begin1 = dem.getRecombArray()[reg];
 				if(fixedNumMut==-1){
 					mutrate = theta * treeTime[reg] * reglen[reg];
 					numMuts = poissoner.poission(mutrate);
-				if(aFile!=null){	
-						out.write(String.format("> [%f,  %f]  time %d E[muts] = %f (%d)\n",
-								begin,reglen[reg],(int)treeTime[reg],mutrate,numMuts));
+					nMutByRegion[reg]=numMuts;
 				}
-				}
-					
-				else{ 
-					numMuts = nMutByRegion[reg];
-					if(aFile.canWrite()){
-						out.write(String.format("> [%f, %f]  time %d E[muts] = %f (%d)\n",
-									begin,reglen[reg],(int) treeTime[reg],0,numMuts));
-					}
-					
-					
-				}
+				
 				if(out!=null)
 					out.close();
-				
 				summut += numMuts;
-				
-				for(i=0;i<numMuts;i++){
+				//move this out of the for loop here 
+				/*for(i=0;i<numMuts;i++){
 					loc = begin + random.randomDouble()*reglen[reg];
 					randMark = random.randomDouble();
 					mutate.mutateFindAndPrint(aFile, reg, loc, randMark, treeTime[reg], aMutList, aHap);
+				}*/
+			}
+			int[][] snpMap = new int[numRegions][0];
+			//ArrayList<double[]> snpMap = new ArrayList<double[]>(nMutByRegion.length);
+			int snpNumber = 0;
+			posSnp = new double[summut];
+			for(reg=0;reg<numRegions;reg++){
+				for(int k=0;k<nMutByRegion[reg];k++){
+					posSnp[snpNumber]= dem.getRecombArray()[reg] + random.randomDouble()*reglen[reg];
+					snpNumber++;
 				}
 			}
+			Arrays.sort(posSnp);
+			//reg = 0;
+			snpNumber =0;
+			for(reg=0;reg<numRegions;reg++){
+				snpMap[reg]=new int[nMutByRegion[reg]];
+				for(int l=0;l<nMutByRegion[reg];l++){
+					snpMap[reg][l]= snpNumber++;
+				}
+			}
+	        /*PhysicalStore.Factory<Double, PrimitiveDenseStore> tmpFactory = PrimitiveDenseStore.FACTORY;
+	        PrimitiveDenseStore mutArray = tmpFactory.makeZero(aHap.getTotalSampleSize(), posSnp.length);
+	        mutArray.fillAll(2.0);*/
+			int[][] mutArray = makeMatrix(aHap.getTotalSampleSize(),posSnp.length);
+			CoalescentMain.pool.invoke(new MutateParallel(0, numRegions, posSnp, treeTime, snpMap,
+					mutate, numRegions, mutArray, random, dem));
 			return numMuts;
 			
+		}
+		private int[][] makeMatrix(int totalSampleSize, int length) {
+			int[][] tmp = new int[totalSampleSize][length];
+			for(int j=0;j<totalSampleSize;j++){
+				for(int k=0;k<length;k++){
+					tmp[j][k]=2;
+				}
+			}
+			return tmp;
 		}
 		public double simGetPoissonRate(){
 			coalesceRate = coalesce.coalesceGetRate(); 
