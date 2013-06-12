@@ -16,7 +16,7 @@ final int IQ2 = 52774;
 final int IR1 = 12211;
 final int IR2 = 3791;
 final int  NTAB = 32;
-final double  NDIV = (1+IMM1/NTAB);
+final double  NDIV = (1+(double)IMM1/(double)NTAB);
 final  double EPS = 1.2e-12;
 final  double  RNMX = (1.0-EPS);
 long randseed;
@@ -76,7 +76,7 @@ double ran2(long idum)
         k=idum2/IQ2;
         idum2=IA2*(idum2-k*IQ2)-k*IR2;
         if (idum2 < 0) idum2 += IM2;
-        j=(int) (iy/NDIV);
+        j=(int) ((double)iy/NDIV);
 	if (j == NTAB) j--;
         iy=iv[j]-idum2;
         iv[j] = idum;

@@ -22,9 +22,11 @@ public class coalesce {
 		for (i = 0; i < numpops; i++) {
 			numnodes = dem.getNumNodesInPopByIndex(i);
 			popsize = dem.getPopSizeByIndex(i);
-			if (numnodes > 1)
-				rate += (double) (numnodes * (numnodes - 1)) 
-					/ (4 * popsize);
+			if (numnodes > 1){
+				long num = (numnodes * (numnodes -1 ));
+				long den = 4 * popsize;
+				rate += (double)num/(double)den;
+			}
 		}
 		
 		lastRate = rate;
@@ -40,7 +42,7 @@ public class coalesce {
 	public int coalescePickPopIndex(){
 
 		double  rate = 0,
-			randcounter = random.randomDouble() * lastRate;
+			randcounter = random.randomDouble() * coalesceGetRate();
 		int     popindex = 0,
 			numpops = dem.getNumPops(),
 			numnodes,
@@ -51,9 +53,14 @@ public class coalesce {
 			for (i = 0; i < numpops && randcounter > rate; i++) {
 				numnodes = dem.getNumNodesInPopByIndex(i);
 				popsize = dem.getPopSizeByIndex(i);
-				if (numnodes > 1)
-					rate += (double) (numnodes * (numnodes - 1)) 
-						/ (4 * popsize);
+				if (numnodes > 1){
+					long num = (numnodes*(numnodes-1));
+					long den = 4*popsize;
+					rate+= (double) num / (double) den;
+					
+				}
+					//rate += (double) ((numnodes * (numnodes - 1))/(4 * popsize));
+				
 			}		
 			popindex = i - 1;
 		}

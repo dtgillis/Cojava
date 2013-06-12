@@ -59,7 +59,7 @@ public class gc {
 		if(numPops>1){
 			for( i = 0; i<numPops&&rate<randCounter;i++){
 				numNodes = dem.getNumNodesInPopByIndex(i);
-				rate += (numNodes * gcRate);
+				rate += ((double)numNodes * gcRate);
 				//don't need this multiplication // comment in original code....
 			}
 			popIndex = i - 1;

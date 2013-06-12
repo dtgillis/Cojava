@@ -15,14 +15,16 @@ public class bottleNeck {
 		double t = 0,effectiveN,rate,temp;
 		if(numNodes<2)return;
 		effectiveN = -1.0 / (2.0 * Math.log(1.0 - coeff));
-		rate = (double) (4* effectiveN)/ (numNodes * (numNodes-1));
+		long den = numNodes * (numNodes-1);
+		rate = (double) (4* effectiveN)/ (double) den;
 		temp = poissoner.poissonGetNext(1/rate);
 		t+=temp;
 		while(t<=1.0){
 			dem.coalesceByName(popName, gen + t);
 			numNodes --;
 			if(numNodes>1){
-				rate = (double)(4*effectiveN)/(numNodes * (numNodes -1));
+				den = numNodes * (numNodes-1);
+				rate = (4*effectiveN)/((double)den);
 				t+=poissoner.poissonGetNext(1/rate);
 			}
 			else t++;
