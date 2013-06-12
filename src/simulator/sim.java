@@ -2,35 +2,26 @@ package simulator;
 
 import geneConversion.gc;
 import haplos.Hap2;
-import haplos.hap;
 import historical.histWorker;
-import org.ojalgo.matrix.*;
-import org.ojalgo.matrix.store.PhysicalStore;
-import org.ojalgo.matrix.store.PrimitiveDenseStore;
 
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.concurrent.RecursiveAction;
-
-import pointers.doublePointer;
-import recomb.recListMaker;
-
-import cosiRand.poisson;
-import cosiRand.randomNum;
 
 import migration.migrationWorker;
 import mutate.mutList;
 import mutate.mutations;
-//import mutate.mutations;
-
+import pointers.doublePointer;
+import recomb.recListMaker;
 import coalesce.coalesce;
 import coalescent.CoalescentMain;
+import cosiRand.poisson;
+import cosiRand.randomNum;
 import demography.TreeTime2;
 import demography.demography;
+//import mutate.mutations;
 
 public class sim {
 		double coalesceRate,migrateRate,geneConvRate,recombRate,poissonRate,theta;
@@ -198,12 +189,12 @@ public class sim {
 					snpMap[reg][l]= snpNumber++;
 				}
 			}
-	        /*PhysicalStore.Factory<Double, PrimitiveDenseStore> tmpFactory = PrimitiveDenseStore.FACTORY;
-	        PrimitiveDenseStore mutArray = tmpFactory.makeZero(aHap.getTotalSampleSize(), posSnp.length);
-	        mutArray.fillAll(2.0);*/
+	        
 			int[][] mutArray = makeMatrix(aHap.getTotalSampleSize(),posSnp.length);
 			CoalescentMain.pool.invoke(new MutateParallel(0, numRegions, posSnp, treeTime, snpMap,
 					mutate, numRegions, mutArray, random, dem));
+			aHap.setHapData(mutArray);
+			aHap.setPosSnp(posSnp);
 			return numMuts;
 			
 		}
@@ -221,6 +212,10 @@ public class sim {
 			migrateRate = migFactory.migrateGetRate();
 			recombRate = recomb.recombGetRate();
 			geneConvRate = geneConversion.getRate();
+			assert coalesceRate >=0;
+			assert migrateRate >=0;
+			assert recombRate >=0;
+			assert geneConvRate >= 0;
 			poissonRate = (double)(coalesceRate + migrateRate + recombRate + geneConvRate);
 			return poissonRate;
 			

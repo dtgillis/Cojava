@@ -5,9 +5,6 @@ import java.util.concurrent.RecursiveAction;
 import mutate.mutNodeList;
 import mutate.mutations;
 import nodes.node;
-
-import org.ojalgo.matrix.store.PrimitiveDenseStore;
-
 import cosiRand.randomNum;
 import demography.demography;
 

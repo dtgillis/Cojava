@@ -63,5 +63,17 @@ public class Hap2 {
 	public int getTotalSampleSize(){
 		return aPopMap.totSampleSize;
 	}
+	public int getTotPop(){
+		return aPopMap.totPop;
+	}
+	public int getSampleSize4Pop(int index){
+		return aPopMap.getPopSize(index);
+	}
+	public int getPopNamebyInd(int index){
+		return aPopMap.getPopName(index);
+	}
+	public int[] getPopNameArray(){
+		return aPopMap.ind2name;
+	}
 	
 }

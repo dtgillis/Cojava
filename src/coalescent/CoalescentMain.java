@@ -93,7 +93,7 @@ public class CoalescentMain {
 		out outwriter = new out();
 		if(fileHolder.outFileSet){
 			try {
-				outwriter.printHaps("out", recomb.getLength(), aMutList, haps);
+				outwriter.printHaps("out", recomb.getLength(), hapalt);
 			} catch (IOException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();

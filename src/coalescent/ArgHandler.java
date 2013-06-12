@@ -59,7 +59,7 @@ public class ArgHandler {
 			segFileSet = true;
 		}
 		public File getSegFile(){
-			assert segFileSet;
+			//assert segFileSet;
 			return segFile;
 		}
 		private void setParamFile(String aFile) {
