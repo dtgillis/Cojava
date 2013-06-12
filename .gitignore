@@ -11,6 +11,8 @@
 #data files #####
 out.hap-*
 out.pos-*
-params
+params*
 segs
 recParams
+model.*
+log
