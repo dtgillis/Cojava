@@ -20,6 +20,7 @@ final double  NDIV = (1+(double)IMM1/(double)NTAB);
 final  double EPS = 1.2e-12;
 final  double  RNMX = (1.0-EPS);
 long randseed;
+long idum;
 SecureRandom generator;
  long idum2,iy;
  long[] iv;
@@ -31,7 +32,7 @@ SecureRandom generator;
 	 generator = new SecureRandom();
  }
 public  double randomDouble(){
-	return ran2(randseed);
+	return ran2();
 	}
 public  void setRngSeed(long rseed){
 	randseed = rseed;
@@ -48,11 +49,13 @@ public  void seedRandom(long aSeed){
 	newSeed = Math.abs(newSeed);
 	randseed = newSeed;
 	newSeed *= (-1);
-	ran2(newSeed);
+	idum = newSeed;
+	ran2();
+	
 	
 	
 }
-double ran2(long idum)
+double ran2()
 {
         int j;
         long k;
