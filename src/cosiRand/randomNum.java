@@ -31,7 +31,7 @@ SecureRandom generator;
 	 iv = new long[NTAB];
 	 generator = new SecureRandom();
  }
-public  double randomDouble(){
+public synchronized double randomDouble(){
 	return ran2();
 	}
 public  void setRngSeed(long rseed){
