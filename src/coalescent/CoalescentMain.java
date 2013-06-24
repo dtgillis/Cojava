@@ -1,5 +1,7 @@
 package coalescent;
 
+import java.io.BufferedWriter;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.util.concurrent.ForkJoinPool;
 
@@ -48,11 +50,13 @@ public class CoalescentMain {
 	static Hap2 hapalt;
 	public static ForkJoinPool pool;
 	public static void main(String[] args) throws InterruptedException {
+		long startTimeSim = System.nanoTime();
 		// get and process arguments
 		fileHolder = new ArgHandler(args);
 		fileHolder.setArguments();
 		// fork join pool for parallel stuff
 		pool = new ForkJoinPool();
+		
 		// instantiate all the objects that build on each other
 		segFactory = new segWorker();
 		random = new randomNum();
@@ -84,13 +88,18 @@ public class CoalescentMain {
 		dem.initRecomb();
 		sweeper.sweepInitMut(aMutList, haps);
 		simulator.simExecute();
+		long SimStopTime = System.nanoTime();
+		long mutateTimeStart = System.nanoTime();
 		try {
 			simulator.simMutate(fileHolder.getSegFile(), aMutList, hapalt);
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+		long mutateStopTime = System.nanoTime();
 		out outwriter = new out();
+		//Runtime.getRuntime().gc();
+		long writeTimeStart = System.nanoTime();
 		if(fileHolder.outFileSet){
 			try {
 				outwriter.printHaps("out", recomb.getLength(), hapalt);
@@ -99,10 +108,30 @@ public class CoalescentMain {
 				e.printStackTrace();
 			}
 		}
+		long writeTimeStop = System.nanoTime();
 		
+		long writeTime = writeTimeStop - writeTimeStart;
+		long simTime = SimStopTime - startTimeSim;
+		long mutateTime =  mutateStopTime - mutateTimeStart;
+		try {
+			BufferedWriter out = new BufferedWriter(new FileWriter("Runtime.txt",true));
+			double conversion = Math.pow(10, 9);
+			out.append(String.format("%d\t",pool.getParallelism()));
+			out.append(String.format("%d\t",recomb.getLength()));
+			out.append(String.format("%d\t",hapalt.getTotalSampleSize()));
+			out.append(String.format("%f\t", simTime/conversion));
+			out.append(String.format("%f\t", mutateTime/conversion));
+			out.append(String.format("%f\t", writeTime/conversion));
+			out.append(String.format("%d\t", hapalt.getSnpPos().length));
+			out.append(String.format("%d\n", (Runtime.getRuntime().totalMemory()-Runtime.getRuntime().freeMemory())/1048576));
+			out.close();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		
+		}
 		
-		
-	}
+	
 
 }
