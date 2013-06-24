@@ -18,14 +18,14 @@ public class MutateParallel extends RecursiveAction {
 	int[][] snpMap;
 	mutations mutate;
 	int numRegions,lo,hi,threshold;
-	int[][] mutMat;
+	byte[][] mutMat;
 	randomNum random;
 	demography dem;
 	
 	
 	
 	public MutateParallel(int alo, int ahi, double[] apos, double[] atreeTime, int[][] asnpMap,
-			mutations aMut, int aNumRegions , int[][] aMatrix,
+			mutations aMut, int aNumRegions , byte[][] aMatrix,
 			randomNum aRng, demography adem){
 		pos = apos;
 		treeTime = atreeTime;

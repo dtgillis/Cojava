@@ -29,7 +29,7 @@ public class Hap2 {
 	}
 	demography dem;
 	popMap aPopMap;
-	int[][] hapData;
+	byte[][] hapData;
 	double[] snpPos;
 	public Hap2(demography adem){
 		dem = adem;
@@ -48,13 +48,13 @@ public class Hap2 {
 			aPopMap.totSampleSize += aPopMap.getPopSize(i);
 		}
 	}
-	public void setHapData(int[][] aHapData){
+	public void setHapData(byte[][] aHapData){
 		hapData = aHapData;
 	}
 	public void setPosSnp(double[] aSnpPos){
 		snpPos = aSnpPos;
 	}
-	public int[][] getHapData(){
+	public byte[][] getHapData(){
 		return hapData;
 	}
 	public double[] getSnpPos(){

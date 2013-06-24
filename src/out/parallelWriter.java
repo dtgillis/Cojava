@@ -14,11 +14,11 @@ public class parallelWriter extends RecursiveAction {
 	 */
 	private static final long serialVersionUID = 6142321546560553883L;
 	int threshold,hi,lo,length;
-	int[][] mutArray;
+	byte[][] mutArray;
 	double[] posSnp;
 	int[] ind2Name,popBounds;
 	boolean[] useMut;
-	public parallelWriter(int alo,int ahi,int[][] aMutArray,double[] aSnpPos,
+	public parallelWriter(int alo,int ahi,byte[][] aMutArray,double[] aSnpPos,
 			int[] aind2Name,int[] aPopBounds,boolean[] ausemut,int aLength){
 		threshold =1;
 		mutArray = aMutArray;

@@ -190,7 +190,7 @@ public class sim {
 				}
 			}
 	        
-			int[][] mutArray = makeMatrix(aHap.getTotalSampleSize(),posSnp.length);
+			byte[][] mutArray = makeMatrix(aHap.getTotalSampleSize(),posSnp.length);
 			CoalescentMain.pool.invoke(new MutateParallel(0, numRegions, posSnp, treeTime, snpMap,
 					mutate, numRegions, mutArray, random, dem));
 			aHap.setHapData(mutArray);
@@ -198,8 +198,8 @@ public class sim {
 			return numMuts;
 			
 		}
-		private int[][] makeMatrix(int totalSampleSize, int length) {
-			int[][] tmp = new int[totalSampleSize][length];
+		private byte[][] makeMatrix(int totalSampleSize, int length) {
+			byte[][] tmp = new byte[totalSampleSize][length];
 			for(int j=0;j<totalSampleSize;j++){
 				for(int k=0;k<length;k++){
 					tmp[j][k]=2;
