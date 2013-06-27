@@ -55,7 +55,7 @@ public class CoalescentMain {
 		fileHolder = new ArgHandler(args);
 		fileHolder.setArguments();
 		// fork join pool for parallel stuff
-		pool = new ForkJoinPool();
+		pool = new ForkJoinPool(fileHolder.getNumProcs());
 		
 		// instantiate all the objects that build on each other
 		segFactory = new segWorker();

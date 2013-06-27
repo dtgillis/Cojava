@@ -6,6 +6,7 @@ public class ArgHandler {
 		boolean logFileSet,segFileSet,outFileSet,paramFileSet,Debug;
 		File logFile,segFile,outFile,paramFile;
 		String[] arguments;
+		int numProc;
 		
 		public ArgHandler(String[] args){
 			arguments = args;
@@ -28,6 +29,9 @@ public class ArgHandler {
 				else if(arguments[i].equalsIgnoreCase("-o")){
 					setOutFile(arguments[++i]);
 										
+				}
+				else if(arguments[i].equalsIgnoreCase("-proc")){
+					setNumProcs(arguments[++i]);
 				}
 				else{
 					System.out.println("Warning: illegal argument passed");
@@ -77,5 +81,14 @@ public class ArgHandler {
 		public File getLogFile(){
 			assert logFileSet;
 			return logFile;
+		}
+		private void setNumProcs(String aNum){
+			numProc = Integer.parseInt(aNum);
+		}
+		public int getNumProcs(){
+			if(numProc >0 )
+				return numProc;
+			else //if this has not been set 
+				return 1;
 		}
 }
